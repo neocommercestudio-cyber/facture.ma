@@ -63,40 +63,17 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
 
     // Options pour html2pdf
     const options = {
-      margin: [10, 10, 10, 10],
+      margin: [5, 5, 5, 5],
       filename: `Devis_${quote.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: true,
+        useCORS: false,
         allowTaint: true,
-        foreignObjectRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: quoteContent.scrollWidth,
-        height: quoteContent.scrollHeight,
-        scrollX: 0,
-        scrollY: 0,
-        onclone: function(clonedDoc) {
-          // S'assurer que le contenu complet est visible
-          const clonedContent = clonedDoc.getElementById('quote-content');
-          if (clonedContent) {
-            clonedContent.style.width = 'auto';
-            clonedContent.style.height = 'auto';
-            clonedContent.style.overflow = 'visible';
-            clonedContent.style.position = 'static';
-          }
-          
-          // Gérer les images
-          const images = clonedDoc.querySelectorAll('img');
-          images.forEach(img => {
-            img.style.maxWidth = '100%';
-            img.style.height = 'auto';
-            if (img.src && img.src.startsWith('http')) {
-              img.crossOrigin = 'anonymous';
-            }
-          });
-        }
+        width: 800,
+        height: 1200
       },
       jsPDF: { 
         unit: 'mm', 
@@ -404,18 +381,7 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
           </div>
 
           {/* Quote Content */}
-          <div 
-            id="quote-content" 
-            style={{ 
-              backgroundColor: 'white', 
-              padding: '20px',
-              width: '210mm',
-              minHeight: '297mm',
-              margin: '0 auto',
-              position: 'relative',
-              overflow: 'visible'
-            }}
-          >
+          <div id="quote-content" style={{ backgroundColor: 'white', padding: '20px' }}>
             <TemplateRenderer 
               templateId={selectedTemplate}
               data={quote}

@@ -65,40 +65,17 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
 
     // Options pour html2pdf
     const options = {
-      margin: [10, 10, 10, 10],
+      margin: [5, 5, 5, 5],
       filename: `Facture_${invoice.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
-        allowTaint: true,
-        foreignObjectRendering: true,
+        allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
-        width: invoiceContent.scrollWidth,
-        height: invoiceContent.scrollHeight,
-        scrollX: 0,
-        scrollY: 0,
-        onclone: function(clonedDoc) {
-          // S'assurer que le contenu complet est visible
-          const clonedContent = clonedDoc.getElementById('invoice-content');
-          if (clonedContent) {
-            clonedContent.style.width = 'auto';
-            clonedContent.style.height = 'auto';
-            clonedContent.style.overflow = 'visible';
-            clonedContent.style.position = 'static';
-          }
-          
-          // Gérer les images
-          const images = clonedDoc.querySelectorAll('img');
-          images.forEach(img => {
-            img.style.maxWidth = '100%';
-            img.style.height = 'auto';
-            if (img.src && img.src.startsWith('http')) {
-              img.crossOrigin = 'anonymous';
-            }
-          });
-        }
+        width: 800,
+        height: 1200
       },
       jsPDF: { 
         unit: 'mm', 
@@ -408,21 +385,21 @@ const generateTemplate2HTML = () => {
       </div>
 
       <!-- TOTALS -->
-      <div style="padding:10px;">
+      <div style="padding:30px;">
         <div style="display:flex; justify-content:space-between;">
           
           <!-- Bloc gauche -->
-          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:10px; text-align:center;">
-            <p style="font-size:12px; font-weight:bold; margin-bottom:15px;">Arrêtée la présente facture à la somme de :</p>
-            <p style="font-size:12px; border-top:1px solid black; padding-top:8px; margin:0;">• ${invoice.totalInWords}</p>
+          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:18px; text-align:center;">
+            <p style="font-size:14px; font-weight:bold; margin-bottom:15px;">Arrêtée la présente facture à la somme de :</p>
+            <p style="font-size:14px; border-top:1px solid black; padding-top:8px; margin:0;">• ${invoice.totalInWords}</p>
           </div>
 
           <!-- Bloc droit -->
-          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:10px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
               <span>Total HT :</span><span style="font-weight:500;">${invoice.subtotal.toFixed(2)} MAD</span>
             </div>
-           <div style="margin-bottom:8px; font-size:12px;">
+           <div style="margin-bottom:10px; font-size:18px;">
   ${(() => {
     // Grouper les TVA
     const vatGroups = invoice.items.reduce((acc, item) => {
@@ -442,7 +419,7 @@ const generateTemplate2HTML = () => {
         <span>
           TVA : ${rate}% 
           ${vatRates.length > 1 
-            ? `<span style="font-size:8px; color:#555;">(${vatGroups[rate].products.join(", ")})</span>` 
+            ? `<span style="font-size:10px; color:#555;">(${vatGroups[rate].products.join(", ")})</span>` 
             : ""}
         </span>
         <span><strong>${vatGroups[rate].amount.toFixed(2)} MAD</strong></span>
@@ -459,16 +436,26 @@ const generateTemplate2HTML = () => {
         </div>
       </div>
 
-    
+      <!-- SIGNATURE -->
+      <div style="padding:15px;">
+        <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px; text-align:center;">
+          <p style="font-size:18px; font-weight:bold; margin-bottom:15px;">Signature</p>
+          <div style="border:2px solid black; border-radius:8px; height:100px;"></div>
+        </div>
+      </div>
 
       <!-- FOOTER -->
-      <div style="padding:32px 20px 20px;position:relative;z-index:10;">
-        <p>
-          <strong>${user?.company.name}</strong> | ${user?.company.address} | 
-          <strong>Tél :</strong> ${user?.company.phone} | <strong>ICE :</strong> ${user?.company.ice} |
-          <strong>IF :</strong> ${user?.company.if} | <strong>RC :</strong> ${user?.company.rc} |
-          <strong>CNSS :</strong> ${user?.company.cnss} | <strong>Patente :</strong> ${user?.company.rc} |
-          <strong>EMAIL :</strong> ${user?.company.email} | <strong>SITE WEB :</strong> ${user?.company.website}
+      <div style="background:black; color:white; border-top:2px solid white; padding:20px; text-align:center; font-size:14px;">
+        <p style="margin:0;">
+          <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} —
+          <strong>Tél :</strong> ${user?.company?.phone || ''} —
+          <strong>Email :</strong> ${user?.company?.email || ''} —
+          <strong>Site:</strong> ${user?.company?.website || ''} —
+          <strong>ICE :</strong> ${user?.company?.ice || ''} —
+          <strong>IF :</strong> ${user?.company?.if || ''} —
+          <strong>RC :</strong> ${user?.company?.rc || ''} —
+          <strong>CNSS :</strong> ${user?.company?.cnss || ''} —
+          <strong>Patente :</strong> ${user?.company?.patente || ''}
         </p>
       </div>
 
@@ -937,11 +924,6 @@ const generateTemplate4HTML = () => {
   `;
 };
 
-
-
-
-
-  
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -994,18 +976,7 @@ const generateTemplate4HTML = () => {
           </div>
 
           {/* Invoice Content */}
-          <div 
-            id="invoice-content" 
-            style={{ 
-              backgroundColor: 'white', 
-              padding: '20px',
-              width: '210mm',
-              minHeight: '297mm',
-              margin: '0 auto',
-              position: 'relative',
-              overflow: 'visible'
-            }}
-          >
+          <div id="invoice-content" style={{ backgroundColor: 'white', padding: '20px' }}>
             <TemplateRenderer 
               templateId={selectedTemplate}
               data={invoice}
