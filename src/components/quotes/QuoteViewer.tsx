@@ -229,7 +229,7 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
             <!-- Bloc gauche -->
             <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px;">
               <p style="font-size: 18px; font-weight: bold;text-align:center; margin-bottom: 18px;">Arrêtée le présent devis à la somme de :</p>
-              <p style="font-size: 18px; margin: 0;">• ${convertNumberToWords(quote.totalTTC)}</p>
+              <p style="font-size: 18px; margin: 0;">• ${quote.totalInWords}</p>
             </div>
 
             <!-- Bloc droit -->
@@ -375,7 +375,7 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
             <!-- Bloc gauche -->
             <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:18px; text-align:center;">
               <p style="font-size:14px; font-weight:bold; margin-bottom:15px;">Arrêtée le présent devis à la somme de :</p>
-              <p style="font-size:14px; border-top:1px solid black; padding-top:8px; margin:0;">• ${convertNumberToWords(quote.totalTTC)}</p>
+              <p style="font-size:14px; border-top:1px solid black; padding-top:8px; margin:0;">• ${quote.totalInWords}</p>
             </div>
 
             <!-- Bloc droit -->

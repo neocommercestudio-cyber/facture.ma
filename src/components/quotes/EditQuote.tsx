@@ -122,6 +122,7 @@ export default function EditQuote({ quote, onSave, onCancel }: EditQuoteProps) {
       return;
     }
 
+    const totalInWords = convertNumberToWords(totalTTC);
     onSave({
       clientId: selectedClient.id,
       client: selectedClient,
@@ -130,7 +131,8 @@ export default function EditQuote({ quote, onSave, onCancel }: EditQuoteProps) {
       items,
       subtotal,
       totalVat,
-      totalTTC
+      totalTTC,
+      totalInWords
     });
   };
 

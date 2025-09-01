@@ -50,6 +50,7 @@ export interface Quote {
   subtotal: number;
   totalVat: number;
   totalTTC: number;
+  totalInWords: string;
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired';
   createdAt: string;
   entrepriseId: string;
@@ -376,14 +377,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   // Devis
-  const addQuote = async (quoteData: Omit<Quote, 'id' | 'number' | 'createdAt' | 'entrepriseId'>) => {
+  const addQuote = async (quoteData: Omit<Quote, 'id' | 'number' | 'createdAt' | 'entrepriseId' | 'totalInWords'>) => {
     if (!user) return;
     
     try {
       const quoteNumber = generateQuoteNumber();
+      const totalInWords = convertNumberToWords(quoteData.totalTTC);
+      
       await addDoc(collection(db, 'quotes'), {
         ...quoteData,
         number: quoteNumber,
+        totalInWords,
         entrepriseId: user.id,
         createdAt: new Date().toISOString()
       });
