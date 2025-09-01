@@ -87,22 +87,22 @@ export default function Template2Modern({ data, type }: TemplateProps) {
         <div className="flex justify-between">
           {/* Bloc gauche */}
           <div className="w-80 bg-gray-50 border border-black rounded p-2">
-            <div className="text-lg font-bold border-black pt-3 text-center">
+            <div className="text-sm font-bold border-black pt-3 text-center">
               <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
-            <div className="text-lg border-t border-black pt-3">
+            <div className="text-sm border-t border-black pt-3">
               <p className="text-black">• {data.totalInWords}</p>
             </div>
           </div>
 
           {/* Bloc droit */}
           <div className="w-80 bg-gray-50 border border-black rounded p-6">
-            <div className="flex justify-between text-lg mb-2">
+            <div className="flex justify-between text-sm mb-2">
               <span>Total HT :</span>
               <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
             </div>
             
-<div className="text-lg mb-2">
+<div className="text-sm mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
@@ -125,7 +125,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
         <span>
           TVA : {rate}%{" "}
           {vatRates.length > 1 && (
-            <span style={{ fontSize: "10px", color: "#555" }}>
+            <span style={{ fontSize: "8px", color: "#555" }}>
               ({vatGroups[+rate].products.join(", ")})
             </span>
           )}
