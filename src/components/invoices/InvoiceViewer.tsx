@@ -910,14 +910,13 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
         <strong>IF :</strong> ${user?.company.if || ""} |
         <strong>RC :</strong> ${user?.company.rc || ""} |
         <strong>CNSS :</strong> ${user?.company.cnss || ""} |
-        <strong>Patente :</strong> ${user?.company.rc || ""} |
+        <strong> Patente :</strong> ${user?.company.patente || ""} |
         <strong>EMAIL :</strong> ${user?.company.email || ""} |
         <strong>SITE WEB :</strong> ${user?.company.website || ""}
       </p>
     </div>
   </div>
   `;
-}
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
