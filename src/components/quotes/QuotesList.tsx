@@ -124,7 +124,17 @@ export default function QuotesList() {
       html2canvas: { 
         scale: 2,
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
+        logging: false,
+        onclone: function(clonedDoc) {
+          // Remplacer les images externes par un placeholder en cas d'erreur CORS
+          const images = clonedDoc.querySelectorAll('img');
+          images.forEach(img => {
+            img.onerror = function() {
+              this.style.display = 'none';
+            };
+          });
+        },
         backgroundColor: '#ffffff'
       },
       jsPDF: { 
