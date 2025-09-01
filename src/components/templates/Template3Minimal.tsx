@@ -185,3 +185,4 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
       </div>
     </div>
   );
+}

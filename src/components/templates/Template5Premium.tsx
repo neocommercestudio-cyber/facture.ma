@@ -183,3 +183,4 @@ export default function Template5Premium({ data, type }: TemplateProps) {
       </div>
     </div>
   );
+}
