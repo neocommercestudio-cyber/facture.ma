@@ -385,7 +385,7 @@ const generateTemplate2HTML = () => {
       </div>
 
       <!-- TOTALS -->
-      <div style="padding:30px;">
+      <div style="padding:10px;">
         <div style="display:flex; justify-content:space-between;">
           
           <!-- Bloc gauche -->
