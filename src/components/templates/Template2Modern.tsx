@@ -1,0 +1,179 @@
+import React from 'react';
+import { Invoice, Quote } from '../../contexts/DataContext';
+import { useAuth } from '../../contexts/AuthContext';
+
+interface TemplateProps {
+  data: Invoice | Quote;
+  type: 'invoice' | 'quote';
+}
+
+export default function Template2Modern({ data, type }: TemplateProps) {
+  const { user } = useAuth();
+  const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
+
+  return (
+    <div className="bg-white max-w-4xl mx-auto border border-black" style={{ fontFamily: 'Arial, sans-serif' }}>
+      {/* HEADER */}
+      <div className="p-8 border-b border-black bg-black text-white text-center">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          {user?.company.logo && (
+            <img
+              src={user.company.logo}
+              alt="Logo"
+              className="h-28 w-auto"
+            />
+          )}
+          {/* Nom de l'entreprise centré */}
+          <div className="flex-1 text-center">
+            <h2 className="text-4xl font-extrabold">{user?.company.name}</h2>
+            <h1 className="text-2xl font-bold mt-2">{title}</h1>
+          </div>
+          <div className="w-28"></div> {/* espace vide pour équilibrer */}
+        </div>
+      </div>
+
+      {/* CLIENT + DATES */}
+      <div className="p-8 border-b border-black">
+        <div className="grid grid-cols-2 gap-8">
+          <div className="bg-gray-50 p-6 rounded border border-black">
+            <h3 className="font-bold text-lg text-black mb-3 border-b border-black pb-2 text-center">
+              CLIENT : {data.client.name} {data.client.address}
+            </h3>
+            <div className="text-lg text-black space-y-1 text-center">
+              <p><strong>ICE:</strong> {data.client.ice}</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-6 rounded border border-black">
+            <h3 className="font-bold text-lg text-black mb-3 border-b border-black pb-2 text-center">
+              DATE : {new Date(data.date).toLocaleDateString('fr-FR')}
+            </h3>
+            <div className="text-lg text-black space-y-1 text-center">
+              <p><strong>Facture N° :</strong> {data.number}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* TABLE PRODUITS */}
+      <div className="p-8 border-b border-black">
+        <div className="border border-black rounded">
+          <table className="w-full">
+            <thead className="bg-black text-white">
+              <tr>
+                <th className="border-r border-white px-4 py-3 text-center font-bold">DÉSIGNATION</th>
+                <th className="border-r border-white px-4 py-3 text-center font-bold">QUANTITÉ</th>
+                <th className="border-r border-white px-4 py-3 text-center font-bold">P.U. HT</th>
+                <th className="px-4 py-3 text-center font-bold">TOTAL HT</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.items.map((item, index) => (
+                <tr key={index} className="border-t border-black">
+                  <td className="border-r border-black px-4 py-3  text-center">{item.description}</td>
+                  <td className="border-r border-black px-4 py-3 text-center">{item.quantity.toFixed(3)}</td>
+                  <td className="border-r border-black px-4 py-3 text-center">{item.unitPrice.toFixed(2)} MAD</td>
+                  <td className="px-4 py-3 text-center font-medium">{item.total.toFixed(2)} MAD</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* TOTALS */}
+      <div className="p-8">
+        <div className="flex justify-between">
+          {/* Bloc gauche */}
+          <div className="w-80 bg-gray-50 border border-black rounded p-2">
+            <div className="text-lg font-bold border-black pt-3 text-center">
+              <p>Arrêtée la présente facture à la somme de :</p>
+            </div>
+            <div className="text-lg border-t border-black pt-3">
+              <p className="text-black">• {data.totalInWords}</p>
+            </div>
+          </div>
+
+          {/* Bloc droit */}
+          <div className="w-80 bg-gray-50 border border-black rounded p-6">
+            <div className="flex justify-between text-lg mb-2">
+              <span>Total HT :</span>
+              <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
+            </div>
+            
+<div className="text-lg mb-2">
+  {(() => {
+    // On regroupe par taux de TVA
+    const vatGroups = data.items.reduce(
+      (acc: Record<number, { amount: number; products: string[] }>, item) => {
+        const vatAmount = (item.unitPrice * item.quantity * item.vatRate) / 100;
+        if (!acc[item.vatRate]) {
+          acc[item.vatRate] = { amount: 0, products: [] };
+        }
+        acc[item.vatRate].amount += vatAmount;
+        acc[item.vatRate].products.push(item.description);
+        return acc;
+      },
+      {}
+    );
+
+    const vatRates = Object.keys(vatGroups);
+
+    return vatRates.map((rate) => (
+      <div key={rate} className="flex justify-between">
+        <span>
+          TVA : {rate}%{" "}
+          {vatRates.length > 1 && (
+            <span style={{ fontSize: "10px", color: "#555" }}>
+              ({vatGroups[+rate].products.join(", ")})
+            </span>
+          )}
+        </span>
+        <span className="font-medium">
+          {vatGroups[+rate].amount.toFixed(2)} MAD
+        </span>
+      </div>
+    ));
+  })()}
+</div>
+
+
+            
+            <div className="flex justify-between text-lg font-bold border-t border-black pt-3">
+              <span>TOTAL TTC :</span>
+              <span>{data.totalTTC.toFixed(2)} MAD</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Signature */}
+      <div className="p-8">
+        <div className="flex justify-start">
+          <div className="w-80 bg-gray-50 border border-black rounded p-6 text-center">
+            <div className="text-lg font-bold mb-4">Signature</div>
+            <div className="border-2 border-black rounded-lg h-32 flex items-center justify-center">
+              <span className="text-gray-400 text-sm"> </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <div className="bg-black text-white border-t-2 border-white p-6 text-lg text-center">
+        <p>
+          <strong>{user?.company.name}</strong> {user?.company.address} —
+          <strong> Tél :</strong> {user?.company.phone} —
+          <strong> Email :</strong> —
+          <strong> Site: :</strong> —
+          <strong> ICE:</strong> {user?.company.ice} —
+          <strong> IF:</strong> {user?.company.if} —
+          <strong> RC:</strong> {user?.company.rc} —
+          <strong> CNSS:</strong> {user?.company.cnss} —
+          <strong> Patente:</strong>
+        </p>
+      </div>
+    </div>
+  );
+}
