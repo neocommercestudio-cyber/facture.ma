@@ -165,13 +165,13 @@ export default function Template2Modern({ data, type }: TemplateProps) {
         <p>
           <strong>{user?.company.name}</strong> {user?.company.address} —
           <strong> Tél :</strong> {user?.company.phone} —
-          <strong> Email :</strong> —
-          <strong> Site: :</strong> —
+          <strong> Email :</strong> {user?.company.email} —
+          <strong> Site:</strong> {user?.company.website} —
           <strong> ICE:</strong> {user?.company.ice} —
           <strong> IF:</strong> {user?.company.if} —
           <strong> RC:</strong> {user?.company.rc} —
           <strong> CNSS:</strong> {user?.company.cnss} —
-          <strong> Patente:</strong>
+          <strong> Patente:</strong> {user?.company.patente}
         </p>
       </div>
     </div>

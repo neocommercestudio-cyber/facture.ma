@@ -18,7 +18,10 @@ export default function Settings() {
     cnss: '',
     phone: '',
     address: '',
-    logo: ''
+    logo: '',
+    email: '',
+    patente: '',
+    website: ''
   });
   const [invoiceSettings, setInvoiceSettings] = useState({
     format: 'format2',
@@ -40,7 +43,10 @@ export default function Settings() {
         cnss: user.company.cnss || '',
         phone: user.company.phone || '',
         address: user.company.address || '',
-        logo: user.company.logo || ''
+        logo: user.company.logo || '',
+        email: user.company.email || '',
+        patente: user.company.patente || '',
+        website: user.company.website || ''
       });
       setInvoiceSettings({
         format: user.company.invoiceNumberingFormat || 'format2',
@@ -128,7 +134,10 @@ export default function Settings() {
         cnss: companyData.cnss,
         phone: companyData.phone,
         address: companyData.address,
-        logo: companyData.logo
+        logo: companyData.logo,
+        email: companyData.email,
+        patente: companyData.patente,
+        website: companyData.website
       });
       
       alert('Informations entreprise sauvegardées avec succès !');
@@ -252,6 +261,48 @@ export default function Settings() {
                   onChange={(e) => handleCompanyDataChange('logo', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="https://exemple.com/logo.png"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email de l'entreprise *
+                </label>
+                <input
+                  type="email"
+                  value={companyData.email}
+                  onChange={(e) => handleCompanyDataChange('email', e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="contact@entreprise.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Patente *
+                </label>
+                <input
+                  type="text"
+                  value={companyData.patente}
+                  onChange={(e) => handleCompanyDataChange('patente', e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="12345678"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Site web *
+                </label>
+                <input
+                  type="url"
+                  value={companyData.website}
+                  onChange={(e) => handleCompanyDataChange('website', e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="https://www.entreprise.com"
                 />
               </div>
             </div>

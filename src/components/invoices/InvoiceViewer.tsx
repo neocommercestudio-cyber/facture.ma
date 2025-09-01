@@ -302,8 +302,8 @@ const generateTemplate1HTML = () => {
         <p style="margin:0;">
         <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} 
         <strong>Tél :</strong> ${user?.company?.tele || ''} - 
-        <strong>Email :</strong> ${user?.company?.email || ''}- 
-        Site: ${user?.company?.website || ''} - 
+        <strong>Email :</strong> ${user?.company?.email || ''} - 
+        <strong>Site:</strong> ${user?.company?.website || ''} - 
         <strong>ICE:</strong> ${user?.company?.ice || ''} - 
         <strong>IF:</strong> ${user?.company?.if || ''} - 
         <strong>RC:</strong> ${user?.company?.rc || ''} - 
@@ -447,12 +447,12 @@ const generateTemplate2HTML = () => {
           <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} —
           <strong>Tél :</strong> ${user?.company?.phone || ''} —
           <strong>Email :</strong> ${user?.company?.email || ''} —
-          <strong>Site :</strong> ${user?.company?.cnss || ''} —
+          <strong>Site:</strong> ${user?.company?.website || ''} —
           <strong>ICE :</strong> ${user?.company?.ice || ''} —
           <strong>IF :</strong> ${user?.company?.if || ''} —
           <strong>RC :</strong> ${user?.company?.rc || ''} —
           <strong>CNSS :</strong> ${user?.company?.cnss || ''} —
-          <strong>Patente :</strong> ${user?.company?.cnss || ''}
+          <strong>Patente :</strong> ${user?.company?.patente || ''}
         </p>
       </div>
 

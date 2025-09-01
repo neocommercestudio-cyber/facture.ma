@@ -17,6 +17,9 @@ interface Company {
   cnss: string;
   address: string;
   phone: string;
+  email: string;
+  patente: string;
+  website: string;
   logo?: string;
   invoiceNumberingFormat?: string;
   invoicePrefix?: string;
@@ -126,6 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 address: userData.address,
                 phone: userData.phone,
                 logo: userData.logo,
+                email: userData.email,
+                patente: userData.patente,
+                website: userData.website,
                 invoiceNumberingFormat: userData.invoiceNumberingFormat,
                 invoicePrefix: userData.invoicePrefix,
                 invoiceCounter: userData.invoiceCounter,

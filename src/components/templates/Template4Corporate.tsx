@@ -187,8 +187,8 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
             <strong>Tél :</strong> {user?.company.phone} | <strong>ICE :</strong>{' '}
             {user?.company.ice} | <strong> IF:</strong> {user?.company.if} |{' '}
             <strong> RC:</strong> {user?.company.rc} | <strong> CNSS:</strong>{' '}
-            {user?.company.cnss} | <strong> Patente :</strong> {user?.company.rc}{' '}
-            | <strong> EMAIL :</strong> | <strong> SITE WEB :</strong>
+            {user?.company.cnss} | <strong> Patente :</strong> {user?.company.patente}{' '}
+            | <strong> EMAIL :</strong> {user?.company.email} | <strong> SITE WEB :</strong> {user?.company.website}
           </p>
         </div>
       </div>
