@@ -17,7 +17,7 @@ interface InvoiceViewerProps {
 export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, onUpgrade }: InvoiceViewerProps) {
   const { user } = useAuth();
   const { licenseType } = useLicense();
-  const [selectedTemplate, setSelectedTemplate] = React.useState('template1');
+  const [selectedTemplate, setSelectedTemplate] = React.useState(user?.company?.defaultTemplate || 'template1');
   const [showProModal, setShowProModal] = React.useState(false);
 
   const templates = [

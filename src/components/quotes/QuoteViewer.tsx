@@ -17,7 +17,7 @@ interface QuoteViewerProps {
 export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgrade }: QuoteViewerProps) {
   const { user } = useAuth();
   const { licenseType } = useLicense();
-  const [selectedTemplate, setSelectedTemplate] = React.useState('template1');
+  const [selectedTemplate, setSelectedTemplate] = React.useState(user?.company?.defaultTemplate || 'template1');
   const [showProModal, setShowProModal] = React.useState(false);
 
   const templates = [

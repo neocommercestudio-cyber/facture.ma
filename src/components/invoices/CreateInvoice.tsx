@@ -20,7 +20,7 @@ export default function CreateInvoice() {
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState('template1');
+  const [selectedTemplate, setSelectedTemplate] = useState(user?.company?.defaultTemplate || 'template1');
   const [showPreview, setShowPreview] = useState(false);
   const [showProModal, setShowProModal] = useState(false);
   const [showUpgradePage, setShowUpgradePage] = useState(false);

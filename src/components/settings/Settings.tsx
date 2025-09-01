@@ -27,6 +27,7 @@ export default function Settings() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingCompany, setIsSavingCompany] = useState(false);
   const [defaultTemplate, setDefaultTemplate] = useState('template1');
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
   // Initialiser les paramètres avec les données utilisateur
   React.useEffect(() => {
@@ -45,6 +46,7 @@ export default function Settings() {
         format: user.company.invoiceNumberingFormat || 'format2',
         prefix: user.company.invoicePrefix || 'FAC'
       });
+      setDefaultTemplate(user.company.defaultTemplate || 'template1');
     }
   }, [user]);
 
@@ -92,6 +94,24 @@ export default function Settings() {
       alert('Erreur lors de la sauvegarde des paramètres');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveTemplateSettings = async () => {
+    if (!user) return;
+    
+    setIsSavingTemplate(true);
+    try {
+      await updateCompanySettings({
+        defaultTemplate: defaultTemplate
+      });
+
+      alert('Modèle par défaut sauvegardé avec succès !');
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      alert('Erreur lors de la sauvegarde du modèle');
+    } finally {
+      setIsSavingTemplate(false);
     }
   };
 
@@ -347,9 +367,11 @@ export default function Settings() {
               </div>
               
               <button
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                onClick={handleSaveTemplateSettings}
+                disabled={isSavingTemplate}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
               >
-                Sauvegarder le modèle par défaut
+                {isSavingTemplate ? 'Sauvegarde...' : 'Sauvegarder le modèle par défaut'}
               </button>
             </div>
           </div>

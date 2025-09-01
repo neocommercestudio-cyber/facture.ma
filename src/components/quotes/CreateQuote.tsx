@@ -23,7 +23,7 @@ export default function CreateQuote() {
     date.setDate(date.getDate() + 30);
     return date.toISOString().split('T')[0];
   });
-  const [selectedTemplate, setSelectedTemplate] = useState('template1');
+  const [selectedTemplate, setSelectedTemplate] = useState(user?.company?.defaultTemplate || 'template1');
   const [showPreview, setShowPreview] = useState(false);
   const [showProModal, setShowProModal] = useState(false);
   const [showUpgradePage, setShowUpgradePage] = useState(false);

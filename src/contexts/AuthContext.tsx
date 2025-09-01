@@ -22,6 +22,7 @@ interface Company {
   invoicePrefix?: string;
   invoiceCounter?: number;
   lastInvoiceYear?: number;
+  defaultTemplate?: string;
   subscription?: 'free' | 'pro';
   subscriptionDate?: string;
   expiryDate?: string;
@@ -129,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 invoicePrefix: userData.invoicePrefix,
                 invoiceCounter: userData.invoiceCounter,
                 lastInvoiceYear: userData.lastInvoiceYear,
+                defaultTemplate: userData.defaultTemplate || 'template1',
                 subscription: userData.subscription || 'free',
                 subscriptionDate: userData.subscriptionDate,
                 expiryDate: userData.expiryDate
