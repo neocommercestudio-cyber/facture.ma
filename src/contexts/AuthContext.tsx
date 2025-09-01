@@ -15,6 +15,9 @@ interface Company {
   if: string;
   rc: string;
   cnss: string;
+  patente: string;
+  email: string;
+  website: string;
   address: string;
   phone: string;
   logo?: string;

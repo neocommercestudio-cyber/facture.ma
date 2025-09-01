@@ -16,6 +16,9 @@ export default function Settings() {
     if: '',
     rc: '',
     cnss: '',
+    patente: '',
+    email: '',
+    website: '',
     phone: '',
     address: '',
     logo: ''
@@ -38,6 +41,9 @@ export default function Settings() {
         if: user.company.if || '',
         rc: user.company.rc || '',
         cnss: user.company.cnss || '',
+        patente: user.company.patente || '',
+        email: user.company.email || '',
+        website: user.company.website || '',
         phone: user.company.phone || '',
         address: user.company.address || '',
         logo: user.company.logo || ''
@@ -126,6 +132,9 @@ export default function Settings() {
         if: companyData.if,
         rc: companyData.rc,
         cnss: companyData.cnss,
+        patente: companyData.patente,
+        email: companyData.email,
+        website: companyData.website,
         phone: companyData.phone,
         address: companyData.address,
         logo: companyData.logo
