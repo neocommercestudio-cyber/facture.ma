@@ -56,68 +56,87 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
   };
 
   const generatePDFWithTemplate = () => {
-    // Obtenir le contenu directement depuis l'élément affiché
-    const invoiceContent = document.getElementById('invoice-content');
-    if (!invoiceContent) {
-      alert('Erreur: Contenu de la facture non trouvé');
-      return;
-    }
+    // Créer un élément temporaire avec le HTML complet
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'fixed';
+    tempDiv.style.top = '-9999px';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.backgroundColor = 'white';
+    tempDiv.innerHTML = generateTemplateHTMLWithSelectedTemplate();
+    document.body.appendChild(tempDiv);
 
-    // Options pour html2pdf
-    const options = {
-      margin: [5, 5, 5, 5],
-      filename: `Facture_${invoice.number}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2,
-        useCORS: false,
-        allowTaint: true,
-        foreignObjectRendering: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        width: 800,
-        height: 1200,
-        onclone: function(clonedDoc) {
-          // Forcer le chargement des images dans le document cloné
-          const images = clonedDoc.querySelectorAll('img');
-          images.forEach(img => {
-            if (img.src && img.src.startsWith('http')) {
-              // Créer une version base64 de l'image si possible
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              const originalImg = new Image();
-              originalImg.crossOrigin = 'anonymous';
-              originalImg.onload = function() {
-                canvas.width = this.width;
-                canvas.height = this.height;
-                ctx.drawImage(this, 0, 0);
-                try {
-                  img.src = canvas.toDataURL('image/png');
-                } catch (e) {
-                  console.warn('Impossible de convertir l\'image:', e);
-                }
-              };
-              originalImg.src = img.src;
-            }
-          });
+    // Attendre que les images se chargent
+    const images = tempDiv.querySelectorAll('img');
+    let loadedImages = 0;
+    const totalImages = images.length;
+
+    const generatePDF = () => {
+      // Options pour html2pdf
+      const options = {
+        margin: [10, 10, 10, 10],
+        filename: `Facture_${invoice.number}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 1.5,
+          useCORS: true,
+          allowTaint: false,
+          foreignObjectRendering: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: 794,
+          height: 1123
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait' 
         }
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait' 
-      }
+      };
+
+      // Générer et télécharger le PDF
+      html2pdf()
+        .set(options)
+        .from(tempDiv)
+        .save()
+        .then(() => {
+          // Nettoyer l'élément temporaire
+          document.body.removeChild(tempDiv);
+        })
+        .catch((error) => {
+          console.error('Erreur lors de la génération du PDF:', error);
+          if (document.body.contains(tempDiv)) {
+            document.body.removeChild(tempDiv);
+          }
+          alert('Erreur lors de la génération du PDF');
+        });
     };
 
-    // Générer et télécharger le PDF
-    html2pdf()
-      .set(options)
-      .from(invoiceContent)
-      .save()
-      .catch((error) => {
-        console.error('Erreur lors de la génération du PDF:', error);
-        alert('Erreur lors de la génération du PDF');
+    if (totalImages === 0) {
+      generatePDF();
+    } else {
+      images.forEach(img => {
+        if (img.complete) {
+          loadedImages++;
+          if (loadedImages === totalImages) {
+            generatePDF();
+          }
+        } else {
+          img.onload = () => {
+            loadedImages++;
+            if (loadedImages === totalImages) {
+              generatePDF();
+            }
+          };
+          img.onerror = () => {
+            loadedImages++;
+            if (loadedImages === totalImages) {
+              generatePDF();
+            }
+          };
+        }
       });
+    }
   };
 
   const generateTemplateHTMLWithSelectedTemplate = () => {
@@ -189,156 +208,169 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
     `;
   };
 const generateTemplate1HTML = () => {
-
   return `
-  <div style="background: #fff; max-width: 900px; margin: auto; border: 1px solid #d1d5db; font-family: Arial, sans-serif;">
-    
-    <!-- HEADER -->
-    <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 24px;">
-          ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" style="height: 80px;" />` : ''}
-          <div>
-            <h2 style="font-size: 35px; font-weight: bold; color: #111827; margin: 0;">${user?.company?.name || ''}</h2>
-            <p style="font-size: 15px; color: #4b5563; margin: 2px 0;">${user?.company?.activity || ''}</p>
-            <p style="font-size: 15px; color: #4b5563; margin: 2px 0;">${user?.company?.address || ''}</p>
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Facture ${invoice.number}</title>
+      <style>
+        @page {
+          size: A4;
+          margin: 15mm 10mm 25mm 10mm;
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          font-size: 12px;
+          line-height: 1.4;
+          background: white;
+        }
+        .page-content {
+          width: 100%;
+          max-width: 794px;
+          margin: 0 auto;
+          background: white;
+          padding: 20px;
+        }
+        .logo {
+          max-height: 80px;
+          width: auto;
+          object-fit: contain;
+        }
+        table {
+          page-break-inside: avoid;
+          border-collapse: collapse;
+        }
+        .footer-info {
+          background: #f3f4f6;
+          border-top: 2px solid #9ca3af;
+          padding: 15px;
+          text-align: center;
+          font-size: 10px;
+          color: #374151;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          page-break-inside: avoid;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="page-content">
+        <!-- HEADER -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #d1d5db;">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" class="logo" crossorigin="anonymous" />` : ''}
+            <div>
+              <h2 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">${user?.company?.name || ''}</h2>
+              <p style="font-size: 12px; color: #4b5563; margin: 2px 0;">${user?.company?.address || ''}</p>
+              <p style="font-size: 12px; color: #4b5563; margin: 2px 0;">Tél: ${user?.company?.phone || ''}</p>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <h1 style="font-size: 28px; font-weight: bold; color: #059669; margin: 0;">FACTURE</h1>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>N°:</strong> ${invoice.number}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Date:</strong> ${new Date(invoice.date).toLocaleDateString('fr-FR')}</p>
           </div>
         </div>
-        <div style="text-align: right;">
-          <h1 style="font-size: 28px; font-weight: bold; color: #111827; margin: 0;">Facture</h1>
-        </div>
-      </div>
-    </div>
 
-    <!-- CLIENT + DATES -->
-    <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-        
-        <!-- Client -->
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-          <h3 style="font-weight: bold; font-size: 18px; text-align: center; margin: 0 0 15px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
-            CLIENT : ${invoice.client.name} ${invoice.client.address || ''}
-          </h3>
-          <p style="font-size: 14px; color: #374151; text-align: center; margin: 4px 0;"><strong>ICE:</strong> ${invoice.client.ice || ''}</p>
+        <!-- CLIENT INFO -->
+        <div style="margin-bottom: 30px; padding: 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
+          <h3 style="font-size: 16px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">FACTURÉ À:</h3>
+          <div style="display: flex; justify-content: space-between;">
+            <div>
+              <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">${invoice.client.name}</p>
+              <p style="margin: 5px 0; font-size: 12px;">${invoice.client.address || ''}</p>
+              <p style="margin: 5px 0; font-size: 12px;">Tél: ${invoice.client.phone || ''}</p>
+              <p style="margin: 5px 0; font-size: 12px;">Email: ${invoice.client.email || ''}</p>
+            </div>
+            <div style="text-align: right;">
+              <p style="margin: 5px 0; font-size: 12px;"><strong>ICE:</strong> ${invoice.client.ice}</p>
+            </div>
+          </div>
         </div>
 
-        <!-- Dates -->
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-          <h3 style="font-weight: bold; font-size: 18px; text-align: center; margin: 0 0 15px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
-            DATES : ${new Date(invoice.date).toLocaleDateString('fr-FR')}
-          </h3>
-          <p style="font-size: 14px; color: #374151; text-align: center; margin: 4px 0;">
-            <strong>Facture N° :</strong> ${invoice.number}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- TABLE PRODUITS -->
-    <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead style="background: #f3f4f6;">
-          <tr>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">DÉSIGNATION</th>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">QUANTITÉ</th>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">P.U. HT</th>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">TOTAL HT</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${invoice.items.map((item: any) => `
-            <tr>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.description}</td>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.quantity.toFixed(3)}</td>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.unitPrice.toFixed(2)} MAD</td>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.total.toFixed(2)} MAD</td>
+        <!-- TABLE PRODUITS -->
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px;">
+          <thead>
+            <tr style="background: #f3f4f6;">
+              <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb; font-weight: bold;">DÉSIGNATION</th>
+              <th style="padding: 12px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold;">QTÉ</th>
+              <th style="padding: 12px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold;">P.U. HT</th>
+              <th style="padding: 12px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold;">TOTAL HT</th>
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            ${invoice.items.map((item: any) => `
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e5e7eb;">${item.description}</td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">${item.quantity.toFixed(3)}</td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">${item.unitPrice.toFixed(2)} MAD</td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold;">${item.total.toFixed(2)} MAD</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
 
-    <!-- TOTALS -->
-    <div style="padding: 30px;">
-      <div style="display: flex; justify-content: space-between; gap: 30px;">
-        
-        <!-- Bloc gauche -->
-        <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px;">
-          <p style="font-size: 18px; font-weight: bold;text-align:center; margin-bottom: 18px;">Arrêtée la présente facture à la somme de :</p>
-          <p style="font-size: 18px; margin: 0;">• ${invoice.totalInWords}</p>
+        <!-- TOTAUX -->
+        <div style="margin: 30px 0;">
+          <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <!-- Montant en lettres -->
+            <div style="width: 45%; background: #f0f9ff; padding: 15px; border-radius: 8px; border: 1px solid #0ea5e9;">
+              <p style="margin: 0; font-size: 14px; font-weight: bold; color: #0c4a6e;">
+                Arrêtée la présente facture à la somme de:
+              </p>
+              <p style="margin: 10px 0 0 0; font-size: 14px; font-weight: bold; color: #0c4a6e;">
+                ${invoice.totalInWords}
+              </p>
+            </div>
+
+            <!-- Calculs -->
+            <div style="width: 45%; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <div style="display: flex; justify-content: space-between; margin: 5px 0; font-size: 14px;">
+                <span>Sous-total HT:</span>
+                <span><strong>${invoice.subtotal.toFixed(2)} MAD</strong></span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin: 5px 0; font-size: 14px;">
+                <span>TVA:</span>
+                <span><strong>${invoice.totalVat.toFixed(2)} MAD</strong></span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; color: #059669; border-top: 2px solid #059669; padding-top: 10px; margin-top: 10px;">
+                <span>Total TTC:</span>
+                <span>${invoice.totalTTC.toFixed(2)} MAD</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Bloc droit -->
-        <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px;">
-            <span>Total HT :</span>
-            <span><strong>${invoice.subtotal.toFixed(2)} MAD</strong></span>
-          </div>
-         <div style="margin-bottom:10px; font-size:18px;">
-  ${(() => {
-    // Grouper les TVA
-    const vatGroups = invoice.items.reduce((acc, item) => {
-      const vatAmount = (item.unitPrice * item.quantity * item.vatRate) / 100;
-      if (!acc[item.vatRate]) {
-        acc[item.vatRate] = { amount: 0, products: [] };
-      }
-      acc[item.vatRate].amount += vatAmount;
-      acc[item.vatRate].products.push(item.description);
-      return acc;
-    }, {});
-
-    const vatRates = Object.keys(vatGroups);
-
-    return vatRates.map(rate => `
-      <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-        <span>
-          TVA : ${rate}% 
-          ${vatRates.length > 1 
-            ? `<span style="font-size:10px; color:#555;">(${vatGroups[rate].products.join(", ")})</span>` 
-            : ""}
-        </span>
-        <span><strong>${vatGroups[rate].amount.toFixed(2)} MAD</strong></span>
-      </div>
-    `).join("");
-  })()}
-</div>
-
-
-
-          
-          <div style="display: flex; justify-content: space-between; border-top: 1px solid #d1d5db; padding-top: 15px; font-weight: bold; font-size: 18px;">
-            <span>TOTAL TTC :</span>
-            <span>${invoice.totalTTC.toFixed(2)} MAD</span>
+        <!-- SIGNATURE -->
+        <div style="margin: 30px 0;">
+          <div style="width: 250px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; text-align: center;">
+            <div style="font-weight: bold; margin-bottom: 10px;">Signature</div>
+            <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 80px;"></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- SIGNATURE -->
-    <div style="padding: 10px;">
-      <div style="width: 300px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
-        <div style="font-weight: bold; margin-bottom: 18px;">Signature</div>
-        <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 120px;"></div>
+      <!-- FOOTER FIXE -->
+      <div class="footer-info">
+        <p style="margin: 0;">
+          <strong>${user?.company?.name || ''}</strong> | ${user?.company?.address || ''} |
+          <strong>Tél:</strong> ${user?.company?.phone || ''} |
+          <strong>Email:</strong> ${user?.company?.email || ''} |
+          <strong>ICE:</strong> ${user?.company?.ice || ''} |
+          <strong>IF:</strong> ${user?.company?.if || ''} |
+          <strong>RC:</strong> ${user?.company?.rc || ''} |
+          <strong>CNSS:</strong> ${user?.company?.cnss || ''} |
+          <strong>Patente:</strong> ${user?.company?.patente || ''}
+        </p>
       </div>
-    </div>
-
-    <!-- FOOTER -->
-    <div style="background: #f3f4f6; border-top: 2px solid #9ca3af; padding: 20px;text-align:center; font-size: 18px; color: #374151; ">
-
-
-        <p style="margin:0;">
-        <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} 
-        <strong>Tél :</strong> ${user?.company?.phone || ''} - 
-        <strong>Email :</strong> ${user?.company?.email || ''} - 
-        <strong>Site:</strong> ${user?.company?.website || ''} - 
-        <strong>ICE:</strong> ${user?.company?.ice || ''} - 
-        <strong>IF:</strong> ${user?.company?.if || ''} - 
-        <strong>RC:</strong> ${user?.company?.rc || ''} - 
-        <strong>CNSS:</strong> ${user?.company?.cnss || ''} - 
-        <strong>Patente:</strong> ${user?.company?.patente || ''}
-      </p>
-    </div>
-  </div>
+    </body>
+    </html>
   `;
 };
 
