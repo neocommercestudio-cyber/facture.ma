@@ -437,21 +437,7 @@ export default function QuotesList() {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={() => handleDownloadQuote(quote.id)}
-                        className="text-green-600 hover:text-green-700 transition-colors" 
-                        title="Télécharger PDF"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleConvertToInvoice(quote.id)}
-                        className="text-teal-600 hover:text-teal-700 transition-colors" 
-                        title="Convertir en facture"
-                        disabled={quote.status === 'accepted'}
-                      >
-                        <FileText className="w-4 h-4" />
-                      </button>
+                     
                       <button 
                         onClick={() => handleEditQuote(quote.id)}
                         className="text-amber-600 hover:text-amber-700 transition-colors" title="Modifier">
