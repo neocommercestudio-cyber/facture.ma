@@ -758,12 +758,16 @@ const generateTemplate4HTML = () => {
       </svg>
       <div style="padding:32px 20px 20px;position:relative;z-index:10;">
         <p>
-          <strong>${user?.company.name}</strong> | ${user?.company.address} | 
-          <strong>Tél :</strong> ${user?.company.phone} | <strong>ICE :</strong> ${user?.company.ice} |
-          <strong>IF :</strong> ${user?.company.if} | <strong>RC :</strong> ${user?.company.rc} |
-          <strong>CNSS :</strong> ${user?.company.cnss} | <strong>Patente :</strong> ${user?.company.rc} |
-          <strong>EMAIL :</strong> ${user?.company.email} | <strong>SITE WEB :</strong> ${user?.company.website}
-        </p>
+        <strong>${user?.company.name || ""}</strong> | ${user?.company.address || ""} |
+        <strong>Tél :</strong> ${user?.company.phone || ""} |
+        <strong>ICE :</strong> ${user?.company.ice || ""} |
+        <strong>IF :</strong> ${user?.company.if || ""} |
+        <strong>RC :</strong> ${user?.company.rc || ""} |
+        <strong>CNSS :</strong> ${user?.company.cnss || ""} |
+        <strong>Patente :</strong> ${user?.company.rc || ""} |
+        <strong>EMAIL :</strong> ${user?.company.email || ""} |
+        <strong>SITE WEB :</strong> ${user?.company.website || ""}
+      </p>
       </div>
     </div>
   </div>
