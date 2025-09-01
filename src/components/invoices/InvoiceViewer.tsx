@@ -608,8 +608,9 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
     </div>
   </div>
   `;
+};
   
-  const generateTemplate4HTML = (type: 'invoice' | 'quote') => {
+const generateTemplate4HTML = () => {
       return `
    <div style="background:#fff;max-width:900px;margin:0 auto;box-shadow:0 4px 15px rgba(0,0,0,0.1);border-radius:8px;font-family:Arial,sans-serif;">
     
@@ -756,9 +757,9 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
     </div>
   </div>
   `;
-}
+};
 
-  const generateTemplate5HTML = () => {
+const generateTemplate5HTML = () => {
      return `
   <div style="background:white; max-width:900px; margin:auto; font-family:Arial, sans-serif; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1)">
     
@@ -917,6 +918,7 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
     </div>
   </div>
   `;
+};
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
