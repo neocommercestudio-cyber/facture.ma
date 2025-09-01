@@ -189,3 +189,4 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
       </div>
     </div>
   );
+}
