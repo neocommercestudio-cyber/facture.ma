@@ -407,13 +407,7 @@ export default function InvoicesList() {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={() => handleDownloadInvoice(invoice.id)}
-                        className="text-green-600 hover:text-green-700 transition-colors" 
-                        title="Télécharger PDF"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
+                      
                       <button 
                         onClick={() => handleEditInvoice(invoice.id)}
                         className="text-amber-600 hover:text-amber-700 transition-colors" 
