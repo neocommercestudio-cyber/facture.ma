@@ -5,6 +5,7 @@ import { Invoice } from '../../contexts/DataContext';
 import TemplateRenderer from '../templates/TemplateRenderer';
 import ProTemplateModal from '../license/ProTemplateModal';
 import { X, Download, Edit, Printer } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 
 interface InvoiceViewerProps {
   invoice: Invoice;
@@ -55,40 +56,46 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
   };
 
   const generatePDFWithTemplate = () => {
-    // Créer le contenu HTML avec le template sélectionné
-    const htmlContent = generateTemplateHTMLWithSelectedTemplate();
-    
-    // Créer un blob avec le contenu HTML
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
-    // Créer un lien de téléchargement
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Facture_${invoice.number}.html`;
-    
-    // Déclencher le téléchargement
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Nettoyer l'URL
-    URL.revokeObjectURL(url);
-    
-    // Alternative: Ouvrir dans une nouvelle fenêtre pour impression
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.open();
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      
-      // Attendre le chargement puis déclencher l'impression
-      printWindow.onload = () => {
-        setTimeout(() => {
-          printWindow.print();
-        }, 500);
-      };
-    }
+    // Créer un élément temporaire avec le contenu du template
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = generateTemplateHTMLWithSelectedTemplate();
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '-9999px';
+    document.body.appendChild(tempDiv);
+
+    // Options pour html2pdf
+    const options = {
+      margin: [10, 10, 10, 10],
+      filename: `Facture_${invoice.number}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait' 
+      }
+    };
+
+    // Générer et télécharger le PDF
+    html2pdf()
+      .set(options)
+      .from(tempDiv)
+      .save()
+      .then(() => {
+        // Nettoyer l'élément temporaire
+        document.body.removeChild(tempDiv);
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la génération du PDF:', error);
+        document.body.removeChild(tempDiv);
+        alert('Erreur lors de la génération du PDF');
+      });
   };
 
   const generateTemplateHTMLWithSelectedTemplate = () => {
@@ -296,12 +303,10 @@ const generateTemplate1HTML = () => {
     <!-- FOOTER -->
     <div style="background: #f3f4f6; border-top: 2px solid #9ca3af; padding: 20px;text-align:center; font-size: 18px; color: #374151; ">
 
-        <p style="margin:0;">
 
-   
         <p style="margin:0;">
         <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} 
-        <strong>Tél :</strong> ${user?.company?.tele || ''} - 
+        <strong>Tél :</strong> ${user?.company?.phone || ''} - 
         <strong>Email :</strong> ${user?.company?.email || ''} - 
         <strong>Site:</strong> ${user?.company?.website || ''} - 
         <strong>ICE:</strong> ${user?.company?.ice || ''} - 
@@ -313,7 +318,8 @@ const generateTemplate1HTML = () => {
     </div>
   </div>
   `;
-};  
+};
+
 const generateTemplate2HTML = () => {
   return `
     <div style="background:white; max-width:800px; margin:0 auto; border:1px solid black; font-family: Arial, sans-serif;">
@@ -459,7 +465,8 @@ const generateTemplate2HTML = () => {
     </div>
   `;
 };
-const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
+
+const generateTemplate3HTML = () => {
   return `
   <div style="background: #fff; max-width: 1000px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; position: relative; overflow: hidden; font-family: Arial, sans-serif;">
     
@@ -473,7 +480,7 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
       ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" style="height: 105px; margin: auto; margin-bottom: 18px;" />` : ''}
       <h1 style="font-size: 36px; font-weight: 600; color: #0a1f44; margin: 0;">${user?.company?.name || ''}</h1>
       <h2 style="font-size: 22px; font-weight: 400; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; color: #0a1f44;">
-        ${type === 'invoice' ? 'FACTURE' : 'FACTURE'}
+        FACTURE
       </h2>
     </div>
 
@@ -610,8 +617,8 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
   `;
 };
   
-  const generateTemplate4HTML = (type: 'invoice' | 'quote') => {
-      return `
+const generateTemplate4HTML = () => {
+  return `
    <div style="background:#fff;max-width:900px;margin:0 auto;box-shadow:0 4px 15px rgba(0,0,0,0.1);border-radius:8px;font-family:Arial,sans-serif;">
     
     <!-- HEADER -->
@@ -624,7 +631,7 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
 <div style="flex:1;text-align:center;">
     <h1 style="font-size:40px;font-weight:800;margin:0;">${user?.company.name}</h1>
     <h2 style="font-size:28px;font-weight:600;margin-top:20px;letter-spacing:3px;">
-      ${type === "invoice" ? "FACTURE" : "FACTURE"}
+      FACTURE
     </h2>
   </div>
 
@@ -757,7 +764,7 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
     </div>
   </div>
   `;
-}
+};
 
   const generateTemplate5HTML = () => {
      return `
@@ -918,7 +925,7 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
     </div>
   </div>
   `;
-}
+};
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
