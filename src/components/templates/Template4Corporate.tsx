@@ -65,7 +65,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
               DATE : {new Date(data.date).toLocaleDateString('fr-FR')}
             </h3>
             <div className="text-lg text-black space-y-1 text-center">
-              <p><strong>FACTURE N° :</strong> {data.number}</p>
+              <p><strong> {type === 'invoice' ? 'FACTURE' : 'DEVIS'} N° :</strong> {data.number}</p>
             </div>
           </div>
         </div>
