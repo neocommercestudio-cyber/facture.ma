@@ -152,7 +152,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
       <div className="p-8">
         <div className="flex justify-start">
           <div className="w-80 bg-gray-50 border border-black rounded p-6 text-center">
-            <div className="text-lg font-bold mb-4">Signature</div>
+            <div className="text-sm font-bold mb-4">Signature</div>
             <div className="border-2 border-black rounded-lg h-32 flex items-center justify-center">
               <span className="text-gray-400 text-sm"> </span>
             </div>
