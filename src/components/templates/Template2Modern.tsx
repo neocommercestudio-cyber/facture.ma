@@ -87,22 +87,22 @@ export default function Template2Modern({ data, type }: TemplateProps) {
         <div className="flex justify-between">
           {/* Bloc gauche */}
           <div className="w-80 bg-gray-50 border border-black rounded p-2">
-            <div className="text-sm font-bold border-black pt-3 text-center">
+            <div className="text-base  font-bold border-black pt-3 text-center">
               <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
-            <div className="text-sm border-t border-black pt-3">
+            <div className="text-base  border-t border-black pt-3">
               <p className="text-black">• {data.totalInWords}</p>
             </div>
           </div>
 
           {/* Bloc droit */}
           <div className="w-80 bg-gray-50 border border-black rounded p-6">
-            <div className="flex justify-between text-sm mb-2">
+            <div className="flex justify-between text-base  mb-2">
               <span>Total HT :</span>
               <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
             </div>
             
-<div className="text-sm mb-2">
+<div className="text-base  mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
@@ -152,16 +152,16 @@ export default function Template2Modern({ data, type }: TemplateProps) {
       <div className="p-8">
         <div className="flex justify-start">
           <div className="w-80 bg-gray-50 border border-black rounded p-6 text-center">
-            <div className="text-sm font-bold mb-4">Signature</div>
+            <div className="text-base  font-bold mb-4">Signature</div>
             <div className="border-2 border-black rounded-sm h-32 flex items-center justify-center">
-              <span className="text-gray-400 text-sm"> </span>
+              <span className="text-gray-400 text-base "> </span>
             </div>
           </div>
         </div>
       </div>
 
       {/* FOOTER */}
-      <div className="bg-black text-white border-t-2 border-white p-6 text-sm text-center">
+      <div className="bg-black text-white border-t-2 border-white p-6 text-base  text-center">
       <p>
          <strong> {user?.company.name} </strong>  | {user?.company.address} | <strong>Tél :</strong> {user?.company.phone} | <strong>ICE :</strong> {user?.company.ice} |  <strong> IF:</strong> {user?.company.if} | <strong> RC:</strong> {user?.company.rc} | <strong> CNSS:</strong> {user?.company.cnss} | <strong> Patente :</strong> {user?.company.patente} | <strong> EMAIL :</strong> {user?.company.email} | <strong> SITE WEB  :</strong> {user?.company.website}
         </p>
