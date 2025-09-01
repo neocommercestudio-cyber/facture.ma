@@ -447,7 +447,7 @@ const generateTemplate2HTML = () => {
           <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} —
           <strong>Tél :</strong> ${user?.company?.phone || ''} —
           <strong>Email :</strong> ${user?.company?.email || ''} —
-          <strong>Site :</strong> ${user?.company?.cnss || ''} —
+          <strong>Site :</strong> ${user?.company?.website || ''} —
           <strong>ICE :</strong> ${user?.company?.ice || ''} —
           <strong>IF :</strong> ${user?.company?.if || ''} —
           <strong>RC :</strong> ${user?.company?.rc || ''} —
@@ -608,7 +608,6 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
     </div>
   </div>
   `;
-};
   
   const generateTemplate4HTML = (type: 'invoice' | 'quote') => {
       return `
