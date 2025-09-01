@@ -68,12 +68,22 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: false,
+        useCORS: true,
         allowTaint: true,
+        foreignObjectRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
         width: 800,
-        height: 1200
+        height: 1200,
+        onclone: function(clonedDoc) {
+          // Forcer le chargement des images dans le document cloné
+          const images = clonedDoc.querySelectorAll('img');
+          images.forEach(img => {
+            if (img.src && img.src.startsWith('http')) {
+              img.crossOrigin = 'anonymous';
+            }
+          });
+        }
       },
       jsPDF: { 
         unit: 'mm', 

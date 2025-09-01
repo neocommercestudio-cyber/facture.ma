@@ -108,19 +108,23 @@ export default function QuotesList() {
   };
 
   const downloadQuotePDF = (quote: any, templateId: string = 'template1') => {
-    // Créer un élément visible temporaire pour la génération PDF
+    // Créer un élément temporaire avec le contenu HTML complet
     const tempDiv = document.createElement('div');
     tempDiv.style.position = 'fixed';
-    tempDiv.style.top = '0';
-    tempDiv.style.left = '0';
+    tempDiv.style.top = '-9999px';
+    tempDiv.style.left = '-9999px';
     tempDiv.style.width = '210mm';
     tempDiv.style.minHeight = '297mm';
     tempDiv.style.backgroundColor = 'white';
-    tempDiv.style.zIndex = '-1';
-    tempDiv.style.opacity = '0';
-    tempDiv.innerHTML = generateSimpleQuoteHTML(quote);
+    tempDiv.innerHTML = generateTemplateHTMLWithTemplate(quote, templateId);
     document.body.appendChild(tempDiv);
 
+    // Attendre que les images se chargent
+    const images = tempDiv.querySelectorAll('img');
+    let loadedImages = 0;
+    const totalImages = images.length;
+
+    const generatePDF = () => {
     // Options pour html2pdf
     const options = {
       margin: [5, 5, 5, 5],
@@ -128,8 +132,9 @@ export default function QuotesList() {
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: false,
+        useCORS: true,
         allowTaint: true,
+        foreignObjectRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
         width: 800,
@@ -158,6 +163,33 @@ export default function QuotesList() {
         }
         alert('Erreur lors de la génération du PDF');
       });
+    };
+
+    if (totalImages === 0) {
+      generatePDF();
+    } else {
+      images.forEach(img => {
+        if (img.complete) {
+          loadedImages++;
+          if (loadedImages === totalImages) {
+            generatePDF();
+          }
+        } else {
+          img.onload = () => {
+            loadedImages++;
+            if (loadedImages === totalImages) {
+              generatePDF();
+            }
+          };
+          img.onerror = () => {
+            loadedImages++;
+            if (loadedImages === totalImages) {
+              generatePDF();
+            }
+          };
+        }
+      });
+    }
   };
 
   const generateTemplateHTMLWithTemplate = (quote: any, templateId: string) => {
@@ -230,10 +262,59 @@ export default function QuotesList() {
 
   const generateTemplate1HTML = (quote: any) => {
     return `
-      <div style="padding: 20px; font-family: Arial, sans-serif; background: white;">
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          @page {
+            size: A4;
+            margin: 15mm 10mm 25mm 10mm;
+            @bottom-center {
+              content: element(footer);
+            }
+          }
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+            line-height: 1.4;
+          }
+          .footer {
+            position: running(footer);
+            background: #f3f4f6;
+            border-top: 2px solid #9ca3af;
+            padding: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #374151;
+          }
+          .page-content {
+            margin-bottom: 20mm;
+          }
+          table {
+            page-break-inside: avoid;
+          }
+          .logo {
+            max-height: 60px;
+            width: auto;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="footer">
+          <strong>${user?.company?.name || ''}</strong> | ${user?.company?.address || ''} | 
+          <strong>Tél :</strong> ${user?.company?.phone || ''} | <strong>Email :</strong> ${user?.company?.email || ''} | 
+          <strong>ICE :</strong> ${user?.company?.ice || ''} | <strong>IF :</strong> ${user?.company?.if || ''} | 
+          <strong>RC :</strong> ${user?.company?.rc || ''} | <strong>Patente :</strong> ${user?.company?.patente || ''}
+        </div>
+        
+        <div class="page-content" style="padding: 20px; background: white;">
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #d1d5db;">
           <div>
+            ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" class="logo" crossorigin="anonymous" style="margin-bottom: 10px;" />` : ''}
             <h2 style="margin: 0 0 8px 0; font-size: 20px; color: #1f2937; font-weight: bold;">${quote.client.name || 'Entreprise'}</h2>
             <p style="margin: 2px 0; font-size: 12px;">${quote.client.address || ''}</p>
             <p style="margin: 2px 0; font-size: 12px;">${quote.client.phone || ''}</p>
@@ -247,6 +328,15 @@ export default function QuotesList() {
             <p style="margin: 2px 0; font-size: 12px;"><strong>Date:</strong> ${new Date(quote.date).toLocaleDateString('fr-FR')}</p>
             <p style="margin: 2px 0; font-size: 12px;"><strong>Valide jusqu'au:</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
           </div>
+        </div>
+        
+        <!-- Client Info -->
+        <div style="margin-bottom: 20px; padding: 15px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
+          <h3 style="font-size: 16px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">CLIENT:</h3>
+          <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">${quote.client.name}</p>
+          <p style="margin: 5px 0; font-size: 12px;">${quote.client.address || ''}</p>
+          <p style="margin: 5px 0; font-size: 12px;">ICE: ${quote.client.ice}</p>
+          <p style="margin: 5px 0; font-size: 12px;">Tél: ${quote.client.phone || ''}</p>
         </div>
         
         <!-- Table -->
@@ -292,12 +382,16 @@ export default function QuotesList() {
           </div>
         </div>
         
-        <!-- Footer -->
-        <div style="margin-top: 30px; text-align: center; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 15px; font-size: 10px;">
-          <p><strong>Conditions:</strong> Ce devis est valable jusqu'au ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
-          <p style="margin-top: 8px;">Merci de votre confiance !</p>
+        <!-- Conditions -->
+        <div style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px; border: 1px solid #f59e0b;">
+          <p style="margin: 0; font-size: 12px; color: #92400e;">
+            <strong>Conditions:</strong> Ce devis est valable jusqu'au ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}. 
+            Prix fermes et non révisables. Règlement à 30 jours.
+          </p>
         </div>
-      </div>
+        </div>
+      </body>
+      </html>
     `;
   };
 

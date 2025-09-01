@@ -70,12 +70,37 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: true,
-        allowTaint: false,
+        useCORS: false,
+        allowTaint: true,
+        foreignObjectRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
         width: 800,
-        height: 1200
+        height: 1200,
+        onclone: function(clonedDoc) {
+          // Forcer le chargement des images dans le document cloné
+          const images = clonedDoc.querySelectorAll('img');
+          images.forEach(img => {
+            if (img.src && img.src.startsWith('http')) {
+              // Créer une version base64 de l'image si possible
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              const originalImg = new Image();
+              originalImg.crossOrigin = 'anonymous';
+              originalImg.onload = function() {
+                canvas.width = this.width;
+                canvas.height = this.height;
+                ctx.drawImage(this, 0, 0);
+                try {
+                  img.src = canvas.toDataURL('image/png');
+                } catch (e) {
+                  console.warn('Impossible de convertir l\'image:', e);
+                }
+              };
+              originalImg.src = img.src;
+            }
+          });
+        }
       },
       jsPDF: { 
         unit: 'mm', 
