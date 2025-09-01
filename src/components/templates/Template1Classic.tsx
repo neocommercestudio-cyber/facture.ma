@@ -95,7 +95,7 @@ export default function Template1Classic({ data, type }: TemplateProps) {
     {/* Bloc gauche */}
     <div className="w-80 bg-gray-50 border border-gray-200 rounded p-2">
       <div className="flex justify-between text-lg font-bold border-gray-300 pt-3 text-center">
-        <p > Arrêtée la présente facture à la somme de :</p>
+        <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
       </div>
   
       <div className="flex justify-between text-lg  border-t border-gray-300 pt-3">

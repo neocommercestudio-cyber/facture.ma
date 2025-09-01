@@ -109,7 +109,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
           {/* Bloc gauche */}
         <div className="w-80 bg-gray-50 rounded border border-[#0a1f44] p-4">
             <div className="text-lg font-bold border-black pt-3 text-center">
-              <p>Arrêtée la présente facture à la somme de :</p>
+              <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
           <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#03224C] text-[#03224C]">
               <p > • {data.totalInWords}</p>

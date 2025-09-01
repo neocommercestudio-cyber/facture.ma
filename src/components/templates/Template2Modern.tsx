@@ -88,7 +88,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
           {/* Bloc gauche */}
           <div className="w-80 bg-gray-50 border border-black rounded p-2">
             <div className="text-lg font-bold border-black pt-3 text-center">
-              <p>Arrêtée la présente facture à la somme de :</p>
+              <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
             <div className="text-lg border-t border-black pt-3">
               <p className="text-black">• {data.totalInWords}</p>

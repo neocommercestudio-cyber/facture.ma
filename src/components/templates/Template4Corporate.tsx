@@ -102,7 +102,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
         <div className="flex justify-between">
           <div className="w-80 bg-gray-50 rounded border border-[#24445C] p-4">
             <div className="text-lg font-bold pt-3 text-center text-[#24445C]">
-              <p>Arrêtée la présente facture à la somme de :</p>
+              <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
             <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#24445C] text-[BLACK]">
               <p>• {data.totalInWords}</p>
