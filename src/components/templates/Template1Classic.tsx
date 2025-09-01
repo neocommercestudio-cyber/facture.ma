@@ -55,7 +55,7 @@ export default function Template1Classic({ data, type }: TemplateProps) {
           <div className="bg-gray-50 p-6 rounded border border-gray-200">
             <h3 className="font-bold text-lg text-gray-900 mb-3 border-b border-gray-300 pb-2 text-center">DATES : {new Date(data.date).toLocaleDateString('fr-FR')}</h3>
 <div className="text-lg text-gray-700 space-y-1 text-center">
-               <p className="text-lg  text-gray-700"> <strong>Fcature N° : </strong> {data.number}</p>
+               <p className="text-lg  text-gray-700"> <strong>FACTURE N° : </strong> {data.number}</p>
             </div>
           </div>
         </div>
