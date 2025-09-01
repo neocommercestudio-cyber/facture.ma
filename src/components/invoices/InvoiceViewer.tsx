@@ -65,39 +65,37 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
 
     // Options pour html2pdf
     const options = {
-      margin: [5, 5, 5, 5],
+      margin: [10, 10, 10, 10],
       filename: `Facture_${invoice.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: false,
+        useCORS: true,
         allowTaint: true,
         foreignObjectRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 800,
-        height: 1200,
+        width: invoiceContent.scrollWidth,
+        height: invoiceContent.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
         onclone: function(clonedDoc) {
-          // Forcer le chargement des images dans le document cloné
+          // S'assurer que le contenu complet est visible
+          const clonedContent = clonedDoc.getElementById('invoice-content');
+          if (clonedContent) {
+            clonedContent.style.width = 'auto';
+            clonedContent.style.height = 'auto';
+            clonedContent.style.overflow = 'visible';
+            clonedContent.style.position = 'static';
+          }
+          
+          // Gérer les images
           const images = clonedDoc.querySelectorAll('img');
           images.forEach(img => {
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
             if (img.src && img.src.startsWith('http')) {
-              // Créer une version base64 de l'image si possible
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              const originalImg = new Image();
-              originalImg.crossOrigin = 'anonymous';
-              originalImg.onload = function() {
-                canvas.width = this.width;
-                canvas.height = this.height;
-                ctx.drawImage(this, 0, 0);
-                try {
-                  img.src = canvas.toDataURL('image/png');
-                } catch (e) {
-                  console.warn('Impossible de convertir l\'image:', e);
-                }
-              };
-              originalImg.src = img.src;
+              img.crossOrigin = 'anonymous';
             }
           });
         }
@@ -996,7 +994,18 @@ const generateTemplate4HTML = () => {
           </div>
 
           {/* Invoice Content */}
-          <div id="invoice-content" style={{ backgroundColor: 'white', padding: '20px' }}>
+          <div 
+            id="invoice-content" 
+            style={{ 
+              backgroundColor: 'white', 
+              padding: '20px',
+              width: '210mm',
+              minHeight: '297mm',
+              margin: '0 auto',
+              position: 'relative',
+              overflow: 'visible'
+            }}
+          >
             <TemplateRenderer 
               templateId={selectedTemplate}
               data={invoice}

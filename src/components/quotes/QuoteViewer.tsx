@@ -63,7 +63,7 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
 
     // Options pour html2pdf
     const options = {
-      margin: [5, 5, 5, 5],
+      margin: [10, 10, 10, 10],
       filename: `Devis_${quote.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
@@ -73,12 +73,25 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
         foreignObjectRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 800,
-        height: 1200,
+        width: quoteContent.scrollWidth,
+        height: quoteContent.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
         onclone: function(clonedDoc) {
-          // Forcer le chargement des images dans le document cloné
+          // S'assurer que le contenu complet est visible
+          const clonedContent = clonedDoc.getElementById('quote-content');
+          if (clonedContent) {
+            clonedContent.style.width = 'auto';
+            clonedContent.style.height = 'auto';
+            clonedContent.style.overflow = 'visible';
+            clonedContent.style.position = 'static';
+          }
+          
+          // Gérer les images
           const images = clonedDoc.querySelectorAll('img');
           images.forEach(img => {
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
             if (img.src && img.src.startsWith('http')) {
               img.crossOrigin = 'anonymous';
             }
@@ -391,7 +404,18 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
           </div>
 
           {/* Quote Content */}
-          <div id="quote-content" style={{ backgroundColor: 'white', padding: '20px' }}>
+          <div 
+            id="quote-content" 
+            style={{ 
+              backgroundColor: 'white', 
+              padding: '20px',
+              width: '210mm',
+              minHeight: '297mm',
+              margin: '0 auto',
+              position: 'relative',
+              overflow: 'visible'
+            }}
+          >
             <TemplateRenderer 
               templateId={selectedTemplate}
               data={quote}
