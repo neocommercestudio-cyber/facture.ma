@@ -66,7 +66,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
             </h3>
             <div className="text-lg text-gray-700 space-y-1 text-center">
               <p>
-                <strong>Facture N° :</strong> {data.number}
+                <strong>FACTURE N° :</strong> {data.number}
               </p>
             </div>
           </div>
