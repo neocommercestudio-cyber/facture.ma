@@ -50,7 +50,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
               DATE : {new Date(data.date).toLocaleDateString('fr-FR')}
             </h3>
             <div className="text-lg text-black space-y-1 text-center">
-              <p><strong>Facture N° :</strong> {data.number}</p>
+              <p><strong>FACTURE N° :</strong> {data.number}</p>
             </div>
           </div>
         </div>
