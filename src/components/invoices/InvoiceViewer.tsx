@@ -389,17 +389,17 @@ const generateTemplate2HTML = () => {
         <div style="display:flex; justify-content:space-between;">
           
           <!-- Bloc gauche -->
-          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:18px; text-align:center;">
-            <p style="font-size:14px; font-weight:bold; margin-bottom:15px;">Arrêtée la présente facture à la somme de :</p>
-            <p style="font-size:14px; border-top:1px solid black; padding-top:8px; margin:0;">• ${invoice.totalInWords}</p>
+          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:10px; text-align:center;">
+            <p style="font-size:12px; font-weight:bold; margin-bottom:15px;">Arrêtée la présente facture à la somme de :</p>
+            <p style="font-size:12px; border-top:1px solid black; padding-top:8px; margin:0;">• ${invoice.totalInWords}</p>
           </div>
 
           <!-- Bloc droit -->
-          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
               <span>Total HT :</span><span style="font-weight:500;">${invoice.subtotal.toFixed(2)} MAD</span>
             </div>
-           <div style="margin-bottom:10px; font-size:18px;">
+           <div style="margin-bottom:8px; font-size:12px;">
   ${(() => {
     // Grouper les TVA
     const vatGroups = invoice.items.reduce((acc, item) => {
@@ -419,7 +419,7 @@ const generateTemplate2HTML = () => {
         <span>
           TVA : ${rate}% 
           ${vatRates.length > 1 
-            ? `<span style="font-size:10px; color:#555;">(${vatGroups[rate].products.join(", ")})</span>` 
+            ? `<span style="font-size:8px; color:#555;">(${vatGroups[rate].products.join(", ")})</span>` 
             : ""}
         </span>
         <span><strong>${vatGroups[rate].amount.toFixed(2)} MAD</strong></span>
