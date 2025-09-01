@@ -161,157 +161,15 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
     `;
   };
 
-  const generateTemplate1HTML = () => {
-    return `
-      <div style="background: #fff; max-width: 800px; margin: auto; font-family: Arial, sans-serif; padding: 20px;">
-        
-        <!-- HEADER -->
-        <div style="padding-bottom: 20px; border-bottom: 1px solid #d1d5db; margin-bottom: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 24px;">
-              ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" style="height: 80px;" />` : ''}
-              <div>
-                <h2 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">${user?.company?.name || ''}</h2>
-                <p style="font-size: 12px; color: #4b5563; margin: 2px 0;">${user?.company?.address || ''}</p>
-              </div>
-            </div>
-            <div style="text-align: right;">
-              <h1 style="font-size: 24px; font-weight: bold; color: #7c3aed; margin: 0;">DEVIS</h1>
-              <p style="margin: 2px 0; font-size: 12px;"><strong>N°:</strong> ${quote.number}</p>
-              <p style="margin: 2px 0; font-size: 12px;"><strong>Date:</strong> ${new Date(quote.date).toLocaleDateString('fr-FR')}</p>
-              <p style="margin: 2px 0; font-size: 12px;"><strong>Valide jusqu'au:</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
-            </div>
-          </div>
-        </div>
 
-        <!-- CLIENT + DATES -->
-        <div style="padding-bottom: 20px; border-bottom: 1px solid #d1d5db; margin-bottom: 20px;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-            
-            <!-- Client -->
-            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-              <h3 style="font-weight: bold; font-size: 14px; text-align: center; margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
-                CLIENT : ${quote.client.name} ${quote.client.address || ''}
-              </h3>
-              <p style="font-size: 12px; color: #374151; text-align: center; margin: 4px 0;"><strong>ICE:</strong> ${quote.client.ice || ''}</p>
-            </div>
 
-            <!-- Dates -->
-            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-              <h3 style="font-weight: bold; font-size: 14px; text-align: center; margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
-                DATE : ${new Date(quote.date).toLocaleDateString('fr-FR')}
-              </h3>
-              <p style="font-size: 12px; color: #374151; text-align: center; margin: 4px 0;">
-                <strong>Devis N° :</strong> ${quote.number}
-              </p>
-              <p style="font-size: 12px; color: #374151; text-align: center; margin: 4px 0;">
-                <strong>Valide jusqu'au :</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}
-              </p>
-            </div>
-          </div>
-        </div>
 
-        <!-- TABLE PRODUITS -->
-        <div style="padding-bottom: 20px; border-bottom: 1px solid #d1d5db; margin-bottom: 20px;">
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead style="background: #f3f4f6;">
-              <tr>
-                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">DÉSIGNATION</th>
-                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">QUANTITÉ</th>
-                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">P.U. HT</th>
-                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">TOTAL HT</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${quote.items.map((item: any) => `
-                <tr>
-                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center;">${item.description}</td>
-                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center;">${item.quantity.toFixed(3)}</td>
-                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center;">${item.unitPrice.toFixed(2)} MAD</td>
-                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center; font-weight: 500;">${item.total.toFixed(2)} MAD</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
 
-        <!-- TOTALS -->
-        <div style="margin: 20px 0;">
-          <div style="display: flex; justify-content: space-between; gap: 30px;">
-            
-            <!-- Bloc gauche -->
-            <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px;">
-              <p style="font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 10px;">Arrêtée le présent devis à la somme de :</p>
-              <p style="font-size: 14px; margin: 0;">• ${quote.totalInWords}</p>
-            </div>
 
-            <!-- Bloc droit -->
-            <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
-                <span>Total HT :</span>
-                <span><strong>${quote.subtotal.toFixed(2)} MAD</strong></span>
-              </div>
-              <div style="margin-bottom: 8px; font-size: 14px;">
-                ${(() => {
-                  const vatGroups = quote.items.reduce((acc, item) => {
-                    const vatAmount = (item.unitPrice * item.quantity * item.vatRate) / 100;
-                    if (!acc[item.vatRate]) {
-                      acc[item.vatRate] = { amount: 0, products: [] };
-                    }
-                    acc[item.vatRate].amount += vatAmount;
-                    acc[item.vatRate].products.push(item.description);
-                    return acc;
-                  }, {});
 
-                  const vatRates = Object.keys(vatGroups);
 
-                  return vatRates.map(rate => `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                      <span>
-                        TVA : ${rate}% 
-                        ${vatRates.length > 1 
-                          ? `<span style="font-size:10px; color:#555;">(${vatGroups[rate].products.join(", ")})</span>` 
-                          : ""}
-                      </span>
-                      <span><strong>${vatGroups[rate].amount.toFixed(2)} MAD</strong></span>
-                    </div>
-                  `).join("");
-                })()}
-              </div>
-              
-              <div style="display: flex; justify-content: space-between; border-top: 1px solid #d1d5db; padding-top: 10px; font-weight: bold; font-size: 16px; color: #7c3aed;">
-                <span>TOTAL TTC :</span>
-                <span>${quote.totalTTC.toFixed(2)} MAD</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- SIGNATURE -->
-        <div style="margin: 20px 0;">
-          <div style="width: 300px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
-            <div style="font-weight: bold; margin-bottom: 15px;">Signature</div>
-            <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 100px;"></div>
-          </div>
-        </div>
 
-        <!-- FOOTER -->
-        <div style="background: #f3f4f6; border-top: 2px solid #9ca3af; padding: 15px; text-align: center; font-size: 11px; color: #374151;">
-          <p style="margin:0;">
-            <strong>${user?.company?.name || ''}</strong> | ${user?.company?.address || ''} |
-            <strong>Tél :</strong> ${user?.company?.phone || ''} |
-            <strong>Email :</strong> ${user?.company?.email || ''} |
-            <strong>Site :</strong> ${user?.company?.website || ''} |
-            <strong>ICE :</strong> ${user?.company?.ice || ''} |
-            <strong>IF :</strong> ${user?.company?.if || ''} |
-            <strong>RC :</strong> ${user?.company?.rc || ''} |
-            <strong>CNSS :</strong> ${user?.company?.cnss || ''} |
-            <strong>Patente :</strong> ${user?.company?.patente || ''}
-          </p>
-        </div>
-      </div>
-    `;
-  };
 
   const generateTemplate2HTML = () => {
     return generateTemplate1HTML();
