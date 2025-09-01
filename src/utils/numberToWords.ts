@@ -106,3 +106,6 @@ export function convertNumberToWords(num: number): string {
   
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
+
+// Export pour utilisation dans les templates
+export { convertNumberToWords as default };

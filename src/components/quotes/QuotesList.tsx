@@ -3,15 +3,19 @@ import { Link } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useLicense } from '../../contexts/LicenseContext';
+import QuoteViewer from './QuoteViewer';
+import EditQuote from './EditQuote';
 import ProTemplateModal from '../license/ProTemplateModal';
-import { Plus, Search, Filter, Download, Eye, Edit, Trash2, FileText } from 'lucide-react';
+import { Plus, Search, Filter, Download, Eye, Edit, Trash2, FileText, Crown } from 'lucide-react';
 
 export default function QuotesList() {
   const { t } = useLanguage();
   const { licenseType } = useLicense();
-  const { quotes, deleteQuote, convertQuoteToInvoice } = useData();
+  const { quotes, deleteQuote, convertQuoteToInvoice, updateQuote } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [viewingQuote, setViewingQuote] = useState<string | null>(null);
+  const [editingQuote, setEditingQuote] = useState<string | null>(null);
   const [showProModal, setShowProModal] = useState(false);
   const [blockedTemplateName, setBlockedTemplateName] = useState('');
   const [showUpgradePage, setShowUpgradePage] = useState(false);
@@ -82,15 +86,233 @@ export default function QuotesList() {
     }
   };
 
+  const handleViewQuote = (id: string) => {
+    setViewingQuote(id);
+  };
+
+  const handleEditQuote = (id: string) => {
+    setEditingQuote(id);
+  };
+
   const handleDownloadQuote = (id: string) => {
-    // Vérifier si le template par défaut est Pro et l'utilisateur est Free
-    if (isTemplateProOnly('template1') && licenseType !== 'pro') {
-      setBlockedTemplateName(getTemplateName('template1'));
-      setShowProModal(true);
-      return;
+    const quote = quotes.find(q => q.id === id);
+    if (quote) {
+      if (isTemplateProOnly('template1') && licenseType !== 'pro') {
+        setBlockedTemplateName(getTemplateName('template1'));
+        setShowProModal(true);
+        return;
+      }
+      downloadQuotePDF(quote, 'template1');
     }
-    // Logique de téléchargement normale ici
-    console.log('Téléchargement du devis:', id);
+  };
+
+  const downloadQuotePDF = (quote: any, templateId: string = 'template1') => {
+    const htmlContent = generateTemplateHTMLWithTemplate(quote, templateId);
+    
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Devis_${quote.number}.html`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    URL.revokeObjectURL(url);
+    
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 500);
+      };
+    }
+  };
+
+  const generateTemplateHTMLWithTemplate = (quote: any, templateId: string) => {
+    let templateContent = '';
+    
+    switch (templateId) {
+      case 'template1':
+        templateContent = generateTemplate1HTML(quote);
+        break;
+      case 'template2':
+        templateContent = generateTemplate2HTML(quote);
+        break;
+      case 'template3':
+        templateContent = generateTemplate3HTML(quote);
+        break;
+      case 'template4':
+        templateContent = generateTemplate4HTML(quote);
+        break;
+      case 'template5':
+        templateContent = generateTemplate5HTML(quote);
+        break;
+      default:
+        templateContent = generateTemplate1HTML(quote);
+    }
+    
+    const baseStyles = `
+      <style>
+        @page {
+          size: A4;
+          margin: 15mm;
+        }
+        @media print {
+          body { 
+            margin: 0; 
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .no-print { display: none !important; }
+        }
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.5;
+          color: #333;
+          margin: 0;
+          padding: 0;
+          font-size: 12px;
+          background: white;
+          width: 210mm;
+          min-height: 297mm;
+        }
+      </style>
+    `;
+
+    return `
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Devis ${quote.number}</title>
+        ${baseStyles}
+      </head>
+      <body>
+        ${templateContent}
+      </body>
+      </html>
+    `;
+  };
+
+  const generateTemplate1HTML = (quote: any) => {
+    return `
+      <div style="padding: 20px; font-family: Arial, sans-serif;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #e5e7eb;">
+          <div>
+            <h2 style="margin: 0 0 8px 0; font-size: 18px; color: #1f2937;">Entreprise</h2>
+            <p style="margin: 2px 0; font-size: 12px;">Adresse entreprise</p>
+            <p style="margin: 2px 0; font-size: 12px;">Téléphone entreprise</p>
+            <div style="margin-top: 8px; font-size: 10px; color: #6b7280;">
+              <p style="margin: 1px 0;">ICE: 123456789</p>
+              <p style="margin: 1px 0;">IF: 12345678</p>
+              <p style="margin: 1px 0;">RC: 98765</p>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <h1 style="margin: 0 0 8px 0; font-size: 24px; color: #7c3aed;">DEVIS</h1>
+            <p style="margin: 2px 0; font-size: 12px;"><strong>N°:</strong> ${quote.number}</p>
+            <p style="margin: 2px 0; font-size: 12px;"><strong>Date:</strong> ${new Date(quote.date).toLocaleDateString('fr-FR')}</p>
+            <p style="margin: 2px 0; font-size: 12px;"><strong>Valide jusqu'au:</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
+          </div>
+        </div>
+        
+        <!-- Client -->
+        <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <h3 style="margin: 0 0 10px 0; color: #374151; font-size: 14px;">Devis pour:</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+              <p style="font-weight: 600; margin: 0 0 5px 0; font-size: 12px;">${quote.client.name}</p>
+              <p style="margin: 0 0 3px 0; font-size: 11px;">${quote.client.address || ''}</p>
+              <p style="margin: 0 0 3px 0; font-size: 11px;">${quote.client.phone || ''}</p>
+              <p style="margin: 0; font-size: 11px;">${quote.client.email || ''}</p>
+            </div>
+            <div>
+              <p style="margin: 0; font-size: 11px;"><strong>ICE:</strong> ${quote.client.ice}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Table -->
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 11px;">
+          <thead>
+            <tr style="background: #f3f4f6;">
+              <th style="padding: 8px; text-align: left; border: 1px solid #e5e7eb; font-size: 10px;">Description</th>
+              <th style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-size: 10px;">Qté</th>
+              <th style="padding: 8px; text-align: right; border: 1px solid #e5e7eb; font-size: 10px;">Prix Unit.</th>
+              <th style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-size: 10px;">TVA</th>
+              <th style="padding: 8px; text-align: right; border: 1px solid #e5e7eb; font-size: 10px;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${quote.items.map((item: any) => `
+              <tr>
+                <td style="padding: 8px; border: 1px solid #e5e7eb;">${item.description}</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">${item.quantity}</td>
+                <td style="padding: 8px; text-align: right; border: 1px solid #e5e7eb;">${item.unitPrice.toFixed(2)} MAD</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">${item.vatRate}%</td>
+                <td style="padding: 8px; text-align: right; border: 1px solid #e5e7eb;">${item.total.toFixed(2)} MAD</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        
+        <!-- Totals -->
+        <div style="display: flex; justify-content: flex-end; margin: 20px 0;">
+          <div style="background: #f9fafb; padding: 15px; border-radius: 8px; min-width: 250px; border: 1px solid #e5e7eb;">
+            <div style="display: flex; justify-content: space-between; margin: 4px 0; font-size: 11px;">
+              <span>Sous-total HT:</span>
+              <span>${quote.subtotal.toFixed(2)} MAD</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 4px 0; font-size: 11px;">
+              <span>TVA:</span>
+              <span>${quote.totalVat.toFixed(2)} MAD</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; color: #7c3aed; border-top: 2px solid #e5e7eb; padding-top: 6px; margin-top: 6px;">
+              <span>Total TTC:</span>
+              <span>${quote.totalTTC.toFixed(2)} MAD</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="margin-top: 30px; text-align: center; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 15px; font-size: 10px;">
+          <p><strong>Conditions:</strong> Ce devis est valable jusqu'au ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
+          <p style="margin-top: 8px;">Merci de votre confiance !</p>
+        </div>
+      </div>
+    `;
+  };
+
+  const generateTemplate2HTML = (quote: any) => {
+    return generateTemplate1HTML(quote);
+  };
+
+  const generateTemplate3HTML = (quote: any) => {
+    return generateTemplate1HTML(quote);
+  };
+
+  const generateTemplate4HTML = (quote: any) => {
+    return generateTemplate1HTML(quote);
+  };
+
+  const generateTemplate5HTML = (quote: any) => {
+    return generateTemplate1HTML(quote);
+  };
+
+  const handleSaveEdit = (id: string, updatedData: any) => {
+    updateQuote(id, updatedData);
+    setEditingQuote(null);
   };
 
   const handleConvertToInvoice = (id: string) => {
@@ -208,10 +430,18 @@ export default function QuotesList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center space-x-3">
-                      <button className="text-blue-600 hover:text-blue-700 transition-colors" title="Voir">
+                      <button 
+                        onClick={() => handleViewQuote(quote.id)}
+                        className="text-blue-600 hover:text-blue-700 transition-colors" 
+                        title="Voir"
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="text-green-600 hover:text-green-700 transition-colors" title="Télécharger PDF">
+                      <button 
+                        onClick={() => handleDownloadQuote(quote.id)}
+                        className="text-green-600 hover:text-green-700 transition-colors" 
+                        title="Télécharger PDF"
+                      >
                         <Download className="w-4 h-4" />
                       </button>
                       <button 
@@ -222,7 +452,9 @@ export default function QuotesList() {
                       >
                         <FileText className="w-4 h-4" />
                       </button>
-                      <button className="text-amber-600 hover:text-amber-700 transition-colors" title="Modifier">
+                      <button 
+                        onClick={() => handleEditQuote(quote.id)}
+                        className="text-amber-600 hover:text-amber-700 transition-colors" title="Modifier">
                         <Edit className="w-4 h-4" />
                       </button>
                       <button 
@@ -246,6 +478,28 @@ export default function QuotesList() {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      {viewingQuote && (
+        <QuoteViewer
+          quote={quotes.find(q => q.id === viewingQuote)!}
+          onClose={() => setViewingQuote(null)}
+          onEdit={() => {
+            setViewingQuote(null);
+            setEditingQuote(viewingQuote);
+          }}
+          onDownload={() => handleDownloadQuote(viewingQuote)}
+          onUpgrade={() => setShowUpgradePage(true)}
+        />
+      )}
+
+      {editingQuote && (
+        <EditQuote
+          quote={quotes.find(q => q.id === editingQuote)!}
+          onSave={(updatedData) => handleSaveEdit(editingQuote, updatedData)}
+          onCancel={() => setEditingQuote(null)}
+        />
+      )}
 
       {/* Modal Pro Template */}
       {showProModal && (

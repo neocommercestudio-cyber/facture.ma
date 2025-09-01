@@ -191,8 +191,10 @@ export default function CreateQuote() {
         </div>
         
         <div className="flex space-x-3">
-          <button className="inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button 
             onClick={() => setShowPreview(true)}
+            className="inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <Eye className="w-4 h-4" />
             <span>Aperçu</span>
           </button>
