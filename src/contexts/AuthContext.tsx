@@ -43,6 +43,7 @@ interface AuthContextType {
   register: (email: string, password: string, companyData: Company) => Promise<boolean>;
   logout: () => Promise<void>;
   upgradeSubscription: () => Promise<void>;
+  updateCompanySettings: (settings: Partial<Company>) => Promise<void>;
   checkSubscriptionExpiry: () => Promise<void>;
   isLoading: boolean;
   showExpiryAlert: boolean;
@@ -221,6 +222,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateCompanySettings = async (settings: Partial<Company>): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      await updateDoc(doc(db, 'entreprises', user.id), {
+        ...settings,
+        updatedAt: new Date().toISOString()
+      });
+      
+      // Mettre à jour l'état local immédiatement
+      setUser(prevUser => {
+        if (prevUser) {
+          return {
+            ...prevUser,
+            company: {
+              ...prevUser.company,
+              ...settings
+            }
+          };
+        }
+        return prevUser;
+      });
+      
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des paramètres:', error);
+      throw error;
+    }
+  };
   const checkSubscriptionExpiryManual = async (): Promise<void> => {
     if (!user) return;
     
@@ -251,6 +280,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     upgradeSubscription,
+    updateCompanySettings,
     checkSubscriptionExpiry: checkSubscriptionExpiryManual,
     isLoading,
     showExpiryAlert,

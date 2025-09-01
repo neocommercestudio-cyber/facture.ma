@@ -8,7 +8,7 @@ import { Building2, User, Bell, Shield, FileText, Palette } from 'lucide-react';
 import TemplateSelector from '../templates/TemplateSelector';
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, updateCompanySettings } = useAuth();
   const { t } = useLanguage();
   const [companyData, setCompanyData] = useState({
     name: '',
@@ -81,22 +81,11 @@ export default function Settings() {
     
     setIsSaving(true);
     try {
-      await updateDoc(doc(db, 'entreprises', user.id), {
+      await updateCompanySettings({
         invoiceNumberingFormat: invoiceSettings.format,
-        invoicePrefix: invoiceSettings.prefix,
-        updatedAt: new Date().toISOString()
+        invoicePrefix: invoiceSettings.prefix
       });
-      
-      // Mettre à jour le contexte utilisateur localement
-      const updatedUser = {
-        ...user,
-        company: {
-          ...user.company,
-          invoiceNumberingFormat: invoiceSettings.format,
-          invoicePrefix: invoiceSettings.prefix
-        }
-      };
-      
+
       alert('Paramètres de numérotation sauvegardés avec succès !');
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
@@ -111,7 +100,7 @@ export default function Settings() {
     
     setIsSavingCompany(true);
     try {
-      await updateDoc(doc(db, 'entreprises', user.id), {
+      await updateCompanySettings({
         name: companyData.name,
         ice: companyData.ice,
         if: companyData.if,
@@ -119,8 +108,7 @@ export default function Settings() {
         cnss: companyData.cnss,
         phone: companyData.phone,
         address: companyData.address,
-        logo: companyData.logo,
-        updatedAt: new Date().toISOString()
+        logo: companyData.logo
       });
       
       alert('Informations entreprise sauvegardées avec succès !');
