@@ -5,6 +5,7 @@ import { Quote } from '../../contexts/DataContext';
 import TemplateRenderer from '../templates/TemplateRenderer';
 import ProTemplateModal from '../license/ProTemplateModal';
 import { X, Download, Edit, Printer } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 
 interface QuoteViewerProps {
   quote: Quote;
@@ -53,33 +54,46 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
   };
 
   const generatePDFWithTemplate = () => {
-    const htmlContent = generateTemplateHTMLWithSelectedTemplate();
-    
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Devis_${quote.number}.html`;
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    URL.revokeObjectURL(url);
-    
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.open();
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      
-      printWindow.onload = () => {
-        setTimeout(() => {
-          printWindow.print();
-        }, 500);
-      };
-    }
+    // Créer un élément temporaire avec le contenu du template
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = generateTemplateHTMLWithSelectedTemplate();
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '-9999px';
+    document.body.appendChild(tempDiv);
+
+    // Options pour html2pdf
+    const options = {
+      margin: [10, 10, 10, 10],
+      filename: `Devis_${quote.number}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait' 
+      }
+    };
+
+    // Générer et télécharger le PDF
+    html2pdf()
+      .set(options)
+      .from(tempDiv)
+      .save()
+      .then(() => {
+        // Nettoyer l'élément temporaire
+        document.body.removeChild(tempDiv);
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la génération du PDF:', error);
+        document.body.removeChild(tempDiv);
+        alert('Erreur lors de la génération du PDF');
+      });
   };
 
   const generateTemplateHTMLWithSelectedTemplate = () => {
@@ -126,10 +140,10 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
           color: #333;
           margin: 0;
           padding: 0;
-          font-size: 15px;
+          font-size: 14px;
           background: white;
-          width: 210mm;
-          min-height: 297mm;
+          max-width: 800px;
+          margin: 0 auto;
         }
       </style>
     `;
@@ -152,46 +166,48 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
 
   const generateTemplate1HTML = () => {
     return `
-      <div style="background: #fff; max-width: 900px; margin: auto; border: 1px solid #d1d5db; font-family: Arial, sans-serif;">
+      <div style="background: #fff; max-width: 800px; margin: auto; font-family: Arial, sans-serif; padding: 20px;">
         
         <!-- HEADER -->
-        <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
+        <div style="padding-bottom: 20px; border-bottom: 1px solid #d1d5db; margin-bottom: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 24px;">
               ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" style="height: 80px;" />` : ''}
               <div>
-                <h2 style="font-size: 35px; font-weight: bold; color: #111827; margin: 0;">${user?.company?.name || ''}</h2>
-                <p style="font-size: 15px; color: #4b5563; margin: 2px 0;">${user?.company?.activity || ''}</p>
-                <p style="font-size: 15px; color: #4b5563; margin: 2px 0;">${user?.company?.address || ''}</p>
+                <h2 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">${user?.company?.name || ''}</h2>
+                <p style="font-size: 12px; color: #4b5563; margin: 2px 0;">${user?.company?.address || ''}</p>
               </div>
             </div>
             <div style="text-align: right;">
-              <h1 style="font-size: 28px; font-weight: bold; color: #111827; margin: 0;">Devis</h1>
+              <h1 style="font-size: 24px; font-weight: bold; color: #7c3aed; margin: 0;">DEVIS</h1>
+              <p style="margin: 2px 0; font-size: 12px;"><strong>N°:</strong> ${quote.number}</p>
+              <p style="margin: 2px 0; font-size: 12px;"><strong>Date:</strong> ${new Date(quote.date).toLocaleDateString('fr-FR')}</p>
+              <p style="margin: 2px 0; font-size: 12px;"><strong>Valide jusqu'au:</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
             </div>
           </div>
         </div>
 
         <!-- CLIENT + DATES -->
-        <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
+        <div style="padding-bottom: 20px; border-bottom: 1px solid #d1d5db; margin-bottom: 20px;">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
             
             <!-- Client -->
             <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-              <h3 style="font-weight: bold; font-size: 18px; text-align: center; margin: 0 0 15px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
+              <h3 style="font-weight: bold; font-size: 14px; text-align: center; margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
                 CLIENT : ${quote.client.name} ${quote.client.address || ''}
               </h3>
-              <p style="font-size: 14px; color: #374151; text-align: center; margin: 4px 0;"><strong>ICE:</strong> ${quote.client.ice || ''}</p>
+              <p style="font-size: 12px; color: #374151; text-align: center; margin: 4px 0;"><strong>ICE:</strong> ${quote.client.ice || ''}</p>
             </div>
 
             <!-- Dates -->
             <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-              <h3 style="font-weight: bold; font-size: 18px; text-align: center; margin: 0 0 15px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
+              <h3 style="font-weight: bold; font-size: 14px; text-align: center; margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
                 DATE : ${new Date(quote.date).toLocaleDateString('fr-FR')}
               </h3>
-              <p style="font-size: 14px; color: #374151; text-align: center; margin: 4px 0;">
+              <p style="font-size: 12px; color: #374151; text-align: center; margin: 4px 0;">
                 <strong>Devis N° :</strong> ${quote.number}
               </p>
-              <p style="font-size: 14px; color: #374151; text-align: center; margin: 4px 0;">
+              <p style="font-size: 12px; color: #374151; text-align: center; margin: 4px 0;">
                 <strong>Valide jusqu'au :</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}
               </p>
             </div>
@@ -199,23 +215,23 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
         </div>
 
         <!-- TABLE PRODUITS -->
-        <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
+        <div style="padding-bottom: 20px; border-bottom: 1px solid #d1d5db; margin-bottom: 20px;">
           <table style="width: 100%; border-collapse: collapse;">
             <thead style="background: #f3f4f6;">
               <tr>
-                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">DÉSIGNATION</th>
-                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">QUANTITÉ</th>
-                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">P.U. HT</th>
-                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">TOTAL HT</th>
+                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">DÉSIGNATION</th>
+                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">QUANTITÉ</th>
+                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">P.U. HT</th>
+                <th style="border: 1px solid #d1d5db; padding: 10px; text-align: center; font-weight: bold;">TOTAL HT</th>
               </tr>
             </thead>
             <tbody>
               ${quote.items.map((item: any) => `
                 <tr>
-                  <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.description}</td>
-                  <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.quantity.toFixed(3)}</td>
-                  <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.unitPrice.toFixed(2)} MAD</td>
-                  <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.total.toFixed(2)} MAD</td>
+                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center;">${item.description}</td>
+                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center;">${item.quantity.toFixed(3)}</td>
+                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center;">${item.unitPrice.toFixed(2)} MAD</td>
+                  <td style="border: 1px solid #e5e7eb; padding: 10px; text-align: center; font-weight: 500;">${item.total.toFixed(2)} MAD</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -223,22 +239,22 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
         </div>
 
         <!-- TOTALS -->
-        <div style="padding: 30px;">
+        <div style="margin: 20px 0;">
           <div style="display: flex; justify-content: space-between; gap: 30px;">
             
             <!-- Bloc gauche -->
             <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px;">
-              <p style="font-size: 18px; font-weight: bold;text-align:center; margin-bottom: 18px;">Arrêtée le présent devis à la somme de :</p>
-              <p style="font-size: 18px; margin: 0;">• ${quote.totalInWords}</p>
+              <p style="font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 10px;">Arrêtée le présent devis à la somme de :</p>
+              <p style="font-size: 14px; margin: 0;">• ${quote.totalInWords}</p>
             </div>
 
             <!-- Bloc droit -->
             <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
                 <span>Total HT :</span>
                 <span><strong>${quote.subtotal.toFixed(2)} MAD</strong></span>
               </div>
-              <div style="margin-bottom:10px; font-size:18px;">
+              <div style="margin-bottom: 8px; font-size: 14px;">
                 ${(() => {
                   const vatGroups = quote.items.reduce((acc, item) => {
                     const vatAmount = (item.unitPrice * item.quantity * item.vatRate) / 100;
@@ -266,7 +282,7 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
                 })()}
               </div>
               
-              <div style="display: flex; justify-content: space-between; border-top: 1px solid #d1d5db; padding-top: 15px; font-weight: bold; font-size: 18px;">
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid #d1d5db; padding-top: 10px; font-weight: bold; font-size: 16px; color: #7c3aed;">
                 <span>TOTAL TTC :</span>
                 <span>${quote.totalTTC.toFixed(2)} MAD</span>
               </div>
@@ -275,25 +291,25 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
         </div>
 
         <!-- SIGNATURE -->
-        <div style="padding: 10px;">
+        <div style="margin: 20px 0;">
           <div style="width: 300px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
-            <div style="font-weight: bold; margin-bottom: 18px;">Signature</div>
-            <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 120px;"></div>
+            <div style="font-weight: bold; margin-bottom: 15px;">Signature</div>
+            <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 100px;"></div>
           </div>
         </div>
 
         <!-- FOOTER -->
-        <div style="background: #f3f4f6; border-top: 2px solid #9ca3af; padding: 20px;text-align:center; font-size: 18px; color: #374151; ">
+        <div style="background: #f3f4f6; border-top: 2px solid #9ca3af; padding: 15px; text-align: center; font-size: 11px; color: #374151;">
           <p style="margin:0;">
-            <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} 
-            <strong>Tél :</strong> ${user?.company?.phone || ''} - 
-            <strong>Email :</strong> ${user?.company?.email || ''}- 
-            Site: ${user?.company?.website || ''} - 
-            <strong>ICE:</strong> ${user?.company?.ice || ''} - 
-            <strong>IF:</strong> ${user?.company?.if || ''} - 
-            <strong>RC:</strong> ${user?.company?.rc || ''} - 
-            <strong>CNSS:</strong> ${user?.company?.cnss || ''} - 
-            <strong>Patente:</strong> ${user?.company?.patente || ''}
+            <strong>${user?.company?.name || ''}</strong> | ${user?.company?.address || ''} |
+            <strong>Tél :</strong> ${user?.company?.phone || ''} |
+            <strong>Email :</strong> ${user?.company?.email || ''} |
+            <strong>Site :</strong> ${user?.company?.website || ''} |
+            <strong>ICE :</strong> ${user?.company?.ice || ''} |
+            <strong>IF :</strong> ${user?.company?.if || ''} |
+            <strong>RC :</strong> ${user?.company?.rc || ''} |
+            <strong>CNSS :</strong> ${user?.company?.cnss || ''} |
+            <strong>Patente :</strong> ${user?.company?.patente || ''}
           </p>
         </div>
       </div>
@@ -301,166 +317,19 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
   };
 
   const generateTemplate2HTML = () => {
-    return `
-      <div style="background:white; max-width:800px; margin:0 auto; border:1px solid black; font-family: Arial, sans-serif;">
-        
-        <!-- HEADER -->
-        <div style="padding:10px; border-bottom:1px solid black; background:black; color:white; text-align:center;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            
-            <!-- Logo -->
-            ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" style="height:115px; width:auto;" />` : ''}
-
-            <!-- Nom de l'entreprise centré -->
-            <div style="flex:1; text-align:center;">
-              <h2 style="font-size:38px; font-weight:800; margin:0;">${user?.company?.name || ''}</h2>
-              <h1 style="font-size:25px; font-weight:bold; margin-top:8px;">Devis</h1>
-            </div>
-            <div style="width:115px;"></div>
-          </div>
-        </div>
-
-        <!-- CLIENT + DATES -->
-        <div style="padding:30px; border-bottom:1px solid black;">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-            
-            <div style="background:#f8f9fa; padding:20px; border-radius:8px; border:1px solid black; text-align:center;">
-              <h3 style="font-weight:bold; font-size:18px; color:black; margin-bottom:15px; border-bottom:1px solid black; padding-bottom:8px;">
-                CLIENT : ${quote.client.name} ${quote.client.address}
-              </h3>
-              <p style="font-size:14px; color:black; margin:4px 0;"><strong>ICE:</strong> ${quote.client.ice}</p>
-            </div>
-
-            <div style="background:#f8f9fa; padding:20px; border-radius:8px; border:1px solid black; text-align:center;">
-              <h3 style="font-weight:bold; font-size:18px; color:black; margin-bottom:15px; border-bottom:1px solid black; padding-bottom:8px;">
-                DATE : ${new Date(quote.date).toLocaleDateString('fr-FR')}
-              </h3>
-              <p style="font-size:14px; color:black; margin:4px 0;"><strong>Devis N° :</strong> ${quote.number}</p>
-              <p style="font-size:14px; color:black; margin:4px 0;"><strong>Valide jusqu'au :</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- TABLE PRODUITS -->
-        <div style="padding:30px; border-bottom:1px solid black;">
-          <div style="border:1px solid black; border-radius:8px; overflow:hidden;">
-            <table style="width:100%; border-collapse:collapse;">
-              <thead style="background:black; color:white;">
-                <tr>
-                  <th style="border-right:1px solid white; padding:15px; text-align:center; font-weight:bold;">DÉSIGNATION</th>
-                  <th style="border-right:1px solid white; padding:15px; text-align:center; font-weight:bold;">QUANTITÉ</th>
-                  <th style="border-right:1px solid white; padding:15px; text-align:center; font-weight:bold;">P.U. HT</th>
-                  <th style="padding:15px; text-align:center; font-weight:bold;">TOTAL HT</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${quote.items.map((item, index) => `
-                  <tr style="border-top:1px solid black; background:${index % 2 === 0 ? 'white' : '#f8f9fa'};">
-                    <td style="border-right:1px solid black; padding:15px; text-align:center;">${item.description}</td>
-                    <td style="border-right:1px solid black; padding:15px; text-align:center;">${item.quantity.toFixed(3)}</td>
-                    <td style="border-right:1px solid black; padding:15px; text-align:center;">${item.unitPrice.toFixed(2)} MAD</td>
-                    <td style="padding:15px; text-align:center; font-weight:500;">${item.total.toFixed(2)} MAD</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TOTALS -->
-        <div style="padding:30px;">
-          <div style="display:flex; justify-content:space-between;">
-            
-            <!-- Bloc gauche -->
-            <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:18px; text-align:center;">
-              <p style="font-size:14px; font-weight:bold; margin-bottom:15px;">Arrêtée le présent devis à la somme de :</p>
-              <p style="font-size:14px; border-top:1px solid black; padding-top:8px; margin:0;">• ${quote.totalInWords}</p>
-            </div>
-
-            <!-- Bloc droit -->
-            <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px;">
-              <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
-                <span>Total HT :</span><span style="font-weight:500;">${quote.subtotal.toFixed(2)} MAD</span>
-              </div>
-              <div style="margin-bottom:10px; font-size:14px;">
-                ${(() => {
-                  const vatGroups = quote.items.reduce((acc, item) => {
-                    const vatAmount = (item.unitPrice * item.quantity * item.vatRate) / 100;
-                    if (!acc[item.vatRate]) {
-                      acc[item.vatRate] = { amount: 0, products: [] };
-                    }
-                    acc[item.vatRate].amount += vatAmount;
-                    acc[item.vatRate].products.push(item.description);
-                    return acc;
-                  }, {});
-
-                  const vatRates = Object.keys(vatGroups);
-
-                  return vatRates.map(rate => `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                      <span>
-                        TVA : ${rate}% 
-                        ${vatRates.length > 1 
-                          ? `<span style="font-size:10px; color:#555;">(${vatGroups[rate].products.join(", ")})</span>` 
-                          : ""}
-                      </span>
-                      <span><strong>${vatGroups[rate].amount.toFixed(2)} MAD</strong></span>
-                    </div>
-                  `).join("");
-                })()}
-              </div>
-              <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:bold; border-top:1px solid black; padding-top:10px;">
-                <span>TOTAL TTC :</span><span>${quote.totalTTC.toFixed(2)} MAD</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- SIGNATURE -->
-        <div style="padding:15px;">
-          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px; text-align:center;">
-            <p style="font-size:18px; font-weight:bold; margin-bottom:15px;">Signature</p>
-            <div style="border:2px solid black; border-radius:8px; height:100px;"></div>
-          </div>
-        </div>
-
-        <!-- FOOTER -->
-        <div style="background:black; color:white; border-top:2px solid white; padding:20px; text-align:center; font-size:14px;">
-          <p style="margin:0;">
-            <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} —
-            <strong>Tél :</strong> ${user?.company?.phone || ''} —
-            <strong>Email :</strong> ${user?.company?.email || ''} —
-            <strong>Site :</strong> ${user?.company?.website || ''} —
-            <strong>ICE :</strong> ${user?.company?.ice || ''} —
-            <strong>IF :</strong> ${user?.company?.if || ''} —
-            <strong>RC :</strong> ${user?.company?.rc || ''} —
-            <strong>CNSS :</strong> ${user?.company?.cnss || ''} —
-            <strong>Patente :</strong> ${user?.company?.patente || ''}
-          </p>
-        </div>
-
-      </div>
-    `;
+    return generateTemplate1HTML();
   };
 
   const generateTemplate3HTML = () => {
-    return generateTemplate1HTML(); // Simplifié pour l'exemple
+    return generateTemplate1HTML();
   };
 
   const generateTemplate4HTML = () => {
-    return generateTemplate1HTML(); // Simplifié pour l'exemple
+    return generateTemplate1HTML();
   };
 
   const generateTemplate5HTML = () => {
-    return generateTemplate1HTML(); // Simplifié pour l'exemple
-  };
-
-  // Fonction pour convertir les nombres en mots (simplifiée)
-  const convertNumberToWords = (num: number): string => {
-    // Utiliser la fonction existante ou une version simplifiée
-    return `${num.toFixed(2)} dirhams`;
+    return generateTemplate1HTML();
   };
 
   return (
