@@ -436,15 +436,18 @@ const generateTemplate2HTML = () => {
         </div>
       </div>
 
-      <!-- SIGNATURE -->
-      <div style="padding:15px;">
-        <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px; text-align:center;">
-          <p style="font-size:18px; font-weight:bold; margin-bottom:15px;">Signature</p>
-          <div style="border:2px solid black; border-radius:8px; height:100px;"></div>
-        </div>
-      </div>
+    
 
-     
+      <!-- FOOTER -->
+      <div style="padding:32px 20px 20px;position:relative;z-index:10;">
+        <p>
+          <strong>${user?.company.name}</strong> | ${user?.company.address} | 
+          <strong>Tél :</strong> ${user?.company.phone} | <strong>ICE :</strong> ${user?.company.ice} |
+          <strong>IF :</strong> ${user?.company.if} | <strong>RC :</strong> ${user?.company.rc} |
+          <strong>CNSS :</strong> ${user?.company.cnss} | <strong>Patente :</strong> ${user?.company.rc} |
+          <strong>EMAIL :</strong> ${user?.company.email} | <strong>SITE WEB :</strong> ${user?.company.website}
+        </p>
+      </div>
 
     </div>
   `;
