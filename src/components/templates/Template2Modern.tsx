@@ -14,7 +14,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
   return (
     <div className="bg-white max-w-4xl mx-auto border border-black" style={{ fontFamily: 'Arial, sans-serif' }}>
       {/* HEADER */}
-      <div className="p-8 border-b border-black bg-black text-white text-center">
+      <div className="p-5 border-b border-black bg-black text-white text-center">
         <div className="flex items-center justify-between">
           {/* Logo */}
           {user?.company.logo && (
