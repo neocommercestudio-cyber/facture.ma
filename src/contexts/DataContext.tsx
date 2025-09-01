@@ -249,10 +249,34 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const generateQuoteNumber = () => {
-    const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    const count = quotes.length + 1;
-    return `DEV-${year}${month}-${String(count).padStart(3, '0')}`;
+    if (!user?.company) return 'DEV-2025-001';
+    
+    const currentYear = new Date().getFullYear();
+    const format = user.company.invoiceNumberingFormat || 'format2';
+    const prefix = 'DEV'; // Préfixe fixe pour les devis
+    
+    // Compter les devis de l'année courante pour la numérotation
+    const currentYearQuotes = quotes.filter(quote => 
+      new Date(quote.createdAt).getFullYear() === currentYear
+    );
+    const counter = currentYearQuotes.length + 1;
+    const counterStr = String(counter).padStart(3, '0');
+    
+    // Générer le numéro selon le même format que les factures
+    switch (format) {
+      case 'format1': // 2025-001
+        return `${currentYear}-${counterStr}`;
+      case 'format2': // DEV-2025-001
+        return `${prefix}-${currentYear}-${counterStr}`;
+      case 'format3': // 001/2025
+        return `${counterStr}/${currentYear}`;
+      case 'format4': // 2025/001-DEV
+        return `${currentYear}/${counterStr}-${prefix}`;
+      case 'format5': // DEV001-2025
+        return `${prefix}${counterStr}-${currentYear}`;
+      default:
+        return `${prefix}-${currentYear}-${counterStr}`;
+    }
   };
 
   // Clients

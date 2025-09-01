@@ -271,7 +271,7 @@ export default function Settings() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Format de numérotation des factures
+                  Format de numérotation (Factures & Devis)
                 </label>
                 <select
                   value={invoiceSettings.format}
@@ -284,14 +284,15 @@ export default function Settings() {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Aperçu: {getFormatExample(invoiceSettings.format, invoiceSettings.prefix)}
-                </p>
+                <div className="text-xs text-gray-500 mt-1 space-y-1">
+                  <p>Aperçu facture: {getFormatExample(invoiceSettings.format, invoiceSettings.prefix)}</p>
+                  <p>Aperçu devis: {getFormatExample(invoiceSettings.format, 'DEV')}</p>
+                </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Préfixe personnalisé
+                  Préfixe personnalisé (Factures uniquement)
                 </label>
                 <input
                   type="text"
@@ -301,17 +302,21 @@ export default function Settings() {
                   className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="FAC"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Utilisé dans les formats avec préfixe (max 5 caractères)
-                </p>
+                <div className="text-xs text-gray-500 mt-1 space-y-1">
+                  <p>Utilisé dans les formats avec préfixe (max 5 caractères)</p>
+                  <p>Les devis utilisent automatiquement le préfixe "DEV"</p>
+                </div>
               </div>
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-medium text-blue-900 mb-2">ℹ️ Information importante</h4>
-                <p className="text-sm text-blue-800">
-                  Le compteur se remet automatiquement à 001 chaque nouvelle année. 
-                  Exemple: FAC-2025-256 → FAC-2026-001
-                </p>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Le compteur se remet automatiquement à 001 chaque nouvelle année</li>
+                  <li>• Ce format s'applique aux <strong>factures</strong> ET aux <strong>devis</strong></li>
+                  <li>• Exemple facture: FAC-2025-256 → FAC-2026-001</li>
+                  <li>• Exemple devis: DEV-2025-045 → DEV-2026-001</li>
+                  <li>• Les devis utilisent automatiquement le préfixe "DEV"</li>
+                </ul>
               </div>
               
               <button
@@ -319,7 +324,7 @@ export default function Settings() {
                 disabled={isSaving}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
               >
-                {isSaving ? 'Sauvegarde...' : 'Sauvegarder la numérotation'}
+                {isSaving ? 'Sauvegarde...' : 'Sauvegarder (Factures & Devis)'}
               </button>
             </div>
           </div>
