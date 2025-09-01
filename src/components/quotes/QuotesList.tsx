@@ -108,34 +108,32 @@ export default function QuotesList() {
   };
 
   const downloadQuotePDF = (quote: any, templateId: string = 'template1') => {
-    // Créer un élément temporaire avec le contenu du template
+    // Créer un élément visible temporaire pour la génération PDF
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = generateTemplateHTMLWithTemplate(quote, templateId);
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '-9999px';
+    tempDiv.style.position = 'fixed';
+    tempDiv.style.top = '0';
+    tempDiv.style.left = '0';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.minHeight = '297mm';
+    tempDiv.style.backgroundColor = 'white';
+    tempDiv.style.zIndex = '-1';
+    tempDiv.style.opacity = '0';
+    tempDiv.innerHTML = generateSimpleQuoteHTML(quote);
     document.body.appendChild(tempDiv);
 
     // Options pour html2pdf
     const options = {
-      margin: [10, 10, 10, 10],
+      margin: [5, 5, 5, 5],
       filename: `Devis_${quote.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: true,
-        allowTaint: false,
+        useCORS: false,
+        allowTaint: true,
         logging: false,
-        onclone: function(clonedDoc) {
-          // Remplacer les images externes par un placeholder en cas d'erreur CORS
-          const images = clonedDoc.querySelectorAll('img');
-          images.forEach(img => {
-            img.onerror = function() {
-              this.style.display = 'none';
-            };
-          });
-        },
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: 1200
       },
       jsPDF: { 
         unit: 'mm', 
@@ -155,7 +153,9 @@ export default function QuotesList() {
       })
       .catch((error) => {
         console.error('Erreur lors de la génération du PDF:', error);
-        document.body.removeChild(tempDiv);
+        if (document.body.contains(tempDiv)) {
+          document.body.removeChild(tempDiv);
+        }
         alert('Erreur lors de la génération du PDF');
       });
   };
@@ -315,6 +315,103 @@ export default function QuotesList() {
 
   const generateTemplate5HTML = (quote: any) => {
     return generateTemplate1HTML(quote);
+  };
+
+  const generateSimpleQuoteHTML = (quote: any) => {
+    return `
+      <div style="padding: 20px; font-family: Arial, sans-serif; background: white; width: 100%; min-height: 297mm;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #7c3aed; padding-bottom: 20px;">
+          <h1 style="font-size: 32px; color: #7c3aed; margin: 0; font-weight: bold;">DEVIS</h1>
+          <h2 style="font-size: 24px; color: #1f2937; margin: 10px 0; font-weight: bold;">${user?.company?.name || ''}</h2>
+          <p style="font-size: 14px; color: #6b7280; margin: 5px 0;">${user?.company?.address || ''}</p>
+          <p style="font-size: 14px; color: #6b7280; margin: 5px 0;">Tél: ${user?.company?.phone || ''} | Email: ${user?.company?.email || ''}</p>
+        </div>
+        
+        <!-- Info devis et client -->
+        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+          <div style="width: 48%;">
+            <h3 style="font-size: 16px; font-weight: bold; color: #1f2937; margin-bottom: 10px; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">CLIENT:</h3>
+            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">${quote.client.name}</p>
+            <p style="margin: 5px 0; font-size: 12px;">${quote.client.address || ''}</p>
+            <p style="margin: 5px 0; font-size: 12px;">ICE: ${quote.client.ice}</p>
+            <p style="margin: 5px 0; font-size: 12px;">Tél: ${quote.client.phone || ''}</p>
+            <p style="margin: 5px 0; font-size: 12px;">Email: ${quote.client.email || ''}</p>
+          </div>
+          <div style="width: 48%; text-align: right;">
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Devis N°:</strong> ${quote.number}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Date:</strong> ${new Date(quote.date).toLocaleDateString('fr-FR')}</p>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Valide jusqu'au:</strong> ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}</p>
+          </div>
+        </div>
+        
+        <!-- Table des articles -->
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px;">
+          <thead>
+            <tr style="background: #f8fafc;">
+              <th style="padding: 12px; text-align: left; border: 1px solid #e2e8f0; font-weight: bold;">DESCRIPTION</th>
+              <th style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; font-weight: bold;">QTÉ</th>
+              <th style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; font-weight: bold;">PRIX UNIT.</th>
+              <th style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; font-weight: bold;">TOTAL HT</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${quote.items.map((item: any) => `
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e2e8f0;">${item.description}</td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #e2e8f0;">${item.quantity}</td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #e2e8f0;">${item.unitPrice.toFixed(2)} MAD</td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #e2e8f0; font-weight: bold;">${item.total.toFixed(2)} MAD</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        
+        <!-- Totaux -->
+        <div style="margin-top: 30px;">
+          <div style="float: right; width: 300px; background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px;">
+              <span>Sous-total HT:</span>
+              <span><strong>${quote.subtotal.toFixed(2)} MAD</strong></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px;">
+              <span>TVA:</span>
+              <span><strong>${quote.totalVat.toFixed(2)} MAD</strong></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; color: #7c3aed; border-top: 2px solid #7c3aed; padding-top: 10px; margin-top: 10px;">
+              <span>Total TTC:</span>
+              <span>${quote.totalTTC.toFixed(2)} MAD</span>
+            </div>
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+        
+        <!-- Montant en lettres -->
+        <div style="margin-top: 30px; background: #f0f9ff; padding: 15px; border-radius: 8px; border: 1px solid #0ea5e9;">
+          <p style="margin: 0; font-size: 14px; font-weight: bold; color: #0c4a6e;">
+            Arrêtée le présent devis à la somme de: ${quote.totalInWords}
+          </p>
+        </div>
+        
+        <!-- Conditions -->
+        <div style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px; border: 1px solid #f59e0b;">
+          <p style="margin: 0; font-size: 12px; color: #92400e;">
+            <strong>Conditions:</strong> Ce devis est valable jusqu'au ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}. 
+            Prix fermes et non révisables. Règlement à 30 jours.
+          </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #d1d5db; text-align: center; font-size: 11px; color: #6b7280;">
+          <p style="margin: 0;">
+            <strong>${user?.company?.name || ''}</strong> | ${user?.company?.address || ''} | 
+            Tél: ${user?.company?.phone || ''} | Email: ${user?.company?.email || ''} | 
+            ICE: ${user?.company?.ice || ''} | IF: ${user?.company?.if || ''} | 
+            RC: ${user?.company?.rc || ''} | Patente: ${user?.company?.patente || ''}
+          </p>
+        </div>
+      </div>
+    `;
   };
 
   const handleSaveEdit = (id: string, updatedData: any) => {

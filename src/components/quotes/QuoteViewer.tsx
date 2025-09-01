@@ -54,34 +54,26 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
   };
 
   const generatePDFWithTemplate = () => {
-    // Créer un élément temporaire avec le contenu du template
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = generateTemplateHTMLWithSelectedTemplate();
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '-9999px';
-    document.body.appendChild(tempDiv);
+    // Obtenir le contenu directement depuis l'élément affiché
+    const quoteContent = document.getElementById('quote-content');
+    if (!quoteContent) {
+      alert('Erreur: Contenu du devis non trouvé');
+      return;
+    }
 
     // Options pour html2pdf
     const options = {
-      margin: [10, 10, 10, 10],
+      margin: [5, 5, 5, 5],
       filename: `Devis_${quote.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: true,
-        allowTaint: false,
+        useCORS: false,
+        allowTaint: true,
         logging: false,
-        onclone: function(clonedDoc) {
-          // Remplacer les images externes par un placeholder en cas d'erreur CORS
-          const images = clonedDoc.querySelectorAll('img');
-          images.forEach(img => {
-            img.onerror = function() {
-              this.style.display = 'none';
-            };
-          });
-        },
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: 1200
       },
       jsPDF: { 
         unit: 'mm', 
@@ -93,15 +85,10 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
     // Générer et télécharger le PDF
     html2pdf()
       .set(options)
-      .from(tempDiv)
+      .from(quoteContent)
       .save()
-      .then(() => {
-        // Nettoyer l'élément temporaire
-        document.body.removeChild(tempDiv);
-      })
       .catch((error) => {
         console.error('Erreur lors de la génération du PDF:', error);
-        document.body.removeChild(tempDiv);
         alert('Erreur lors de la génération du PDF');
       });
   };
@@ -394,7 +381,7 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
           </div>
 
           {/* Quote Content */}
-          <div id="quote-content">
+          <div id="quote-content" style={{ backgroundColor: 'white', padding: '20px' }}>
             <TemplateRenderer 
               templateId={selectedTemplate}
               data={quote}

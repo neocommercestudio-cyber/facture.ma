@@ -56,34 +56,26 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
   };
 
   const generatePDFWithTemplate = () => {
-    // Créer un élément temporaire avec le contenu du template
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = generateTemplateHTMLWithSelectedTemplate();
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '-9999px';
-    document.body.appendChild(tempDiv);
+    // Obtenir le contenu directement depuis l'élément affiché
+    const invoiceContent = document.getElementById('invoice-content');
+    if (!invoiceContent) {
+      alert('Erreur: Contenu de la facture non trouvé');
+      return;
+    }
 
     // Options pour html2pdf
     const options = {
-      margin: [10, 10, 10, 10],
+      margin: [5, 5, 5, 5],
       filename: `Facture_${invoice.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
-        useCORS: true,
-        allowTaint: false,
+        useCORS: false,
+        allowTaint: true,
         logging: false,
-        onclone: function(clonedDoc) {
-          // Remplacer les images externes par un placeholder en cas d'erreur CORS
-          const images = clonedDoc.querySelectorAll('img');
-          images.forEach(img => {
-            img.onerror = function() {
-              this.style.display = 'none';
-            };
-          });
-        },
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: 1200
       },
       jsPDF: { 
         unit: 'mm', 
@@ -95,15 +87,10 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
     // Générer et télécharger le PDF
     html2pdf()
       .set(options)
-      .from(tempDiv)
+      .from(invoiceContent)
       .save()
-      .then(() => {
-        // Nettoyer l'élément temporaire
-        document.body.removeChild(tempDiv);
-      })
       .catch((error) => {
         console.error('Erreur lors de la génération du PDF:', error);
-        document.body.removeChild(tempDiv);
         alert('Erreur lors de la génération du PDF');
       });
   };
@@ -989,7 +976,7 @@ const generateTemplate4HTML = () => {
           </div>
 
           {/* Invoice Content */}
-          <div id="invoice-content">
+          <div id="invoice-content" style={{ backgroundColor: 'white', padding: '20px' }}>
             <TemplateRenderer 
               templateId={selectedTemplate}
               data={invoice}
