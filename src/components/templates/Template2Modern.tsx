@@ -29,7 +29,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
             <h2 className="text-3xl font-extrabold">{user?.company.name}</h2>
             <h1 className="text-1xl font-bold mt-2">{title}</h1>
           </div>
-          <div className="w-28"></div> {/* espace vide pour équilibrer */}
+          <div className="w-20"></div> {/* espace vide pour équilibrer */}
         </div>
       </div>
 
