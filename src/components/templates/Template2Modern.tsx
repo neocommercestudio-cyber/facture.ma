@@ -148,17 +148,18 @@ export default function Template2Modern({ data, type }: TemplateProps) {
         </div>
       </div>
 
-      {/* Signature */}
-      <div className="p-8">
-        <div className="flex justify-start">
-          <div className="w-80 bg-gray-50 border border-black rounded p-6 text-center">
-            <div className="text-base  font-bold mb-4">Signature</div>
-            <div className="border-2 border-black rounded-sm h-32 flex items-center justify-center">
-              <span className="text-gray-400 text-base "> </span>
-            </div>
-          </div>
-        </div>
+   {/* Signature */}
+<div className="p-6">
+  <div className="flex justify-start">
+    <div className="w-60 bg-gray-50 border border-black rounded p-4 text-center">
+      <div className="text-sm font-bold mb-3">Signature</div>
+      <div className="border-2 border-black rounded-sm h-20 flex items-center justify-center">
+        <span className="text-gray-400 text-sm"> </span>
       </div>
+    </div>
+  </div>
+</div>
+
 
       {/* FOOTER */}
       <div className="bg-black text-white border-t-2 border-white p-6 text-sm  text-center">
