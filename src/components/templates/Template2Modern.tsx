@@ -87,7 +87,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
         <div className="flex justify-between">
           {/* Bloc gauche */}
           <div className="w-80 bg-gray-50 border border-black rounded p-2">
-            <div className="text-base  font-bold border-black pt-3 text-center">
+            <div className="text-lg  font-bold border-black pt-3 text-center">
               <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
             <div className="text-base  border-t border-black pt-3">
