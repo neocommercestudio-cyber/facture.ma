@@ -452,7 +452,7 @@ const generateTemplate2HTML = () => {
           <strong>IF :</strong> ${user?.company?.if || ''} —
           <strong>RC :</strong> ${user?.company?.rc || ''} —
           <strong>CNSS :</strong> ${user?.company?.cnss || ''} —
-          <strong>Patente :</strong> ${user?.company?.cnss || ''}
+          <strong>Patente :</strong> ${user?.company?.patente || ''}
         </p>
       </div>
 

@@ -220,6 +220,45 @@ export default function Settings() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Patente *
+                </label>
+                <input
+                  type="text"
+                  value={companyData.patente}
+                  onChange={(e) => handleCompanyDataChange('patente', e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="12345678"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email de l'entreprise *
+                </label>
+                <input
+                  type="email"
+                  value={companyData.email}
+                  onChange={(e) => handleCompanyDataChange('email', e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="contact@entreprise.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Site web *
+                </label>
+                <input
+                  type="url"
+                  value={companyData.website}
+                  onChange={(e) => handleCompanyDataChange('website', e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="https://www.entreprise.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   CNSS
                 </label>
                 <input
@@ -227,6 +266,7 @@ export default function Settings() {
                   value={companyData.cnss}
                   onChange={(e) => handleCompanyDataChange('cnss', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="1234567"
                 />
               </div>
               <div>

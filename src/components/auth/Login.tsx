@@ -378,35 +378,6 @@ function RegisterForm({ onBack }: { onBack: () => void }) {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email de l'entreprise *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  placeholder="contact@entreprise.com"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CNSS
-                </label>
-                <input
-                  type="text"
-                  name="cnss"
-                  value={formData.cnss}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  placeholder="1234567"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Patente *
                 </label>
                 <input
@@ -422,15 +393,45 @@ function RegisterForm({ onBack }: { onBack: () => void }) {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Site web
+                  Email de l'entreprise *
+                </label>
+                <input
+                  type="email"
+                  name="companyEmail"
+                  value={formData.companyEmail}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="contact@entreprise.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Site web *
                 </label>
                 <input
                   type="url"
                   name="website"
                   value={formData.website}
                   onChange={handleChange}
+                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="https://www.entreprise.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  CNSS
+                </label>
+                <input
+                  type="text"
+                  name="cnss"
+                  value={formData.cnss}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="1234567"
                 />
               </div>
               
