@@ -447,12 +447,12 @@ const generateTemplate2HTML = () => {
           <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} —
           <strong>Tél :</strong> ${user?.company?.phone || ''} —
           <strong>Email :</strong> ${user?.company?.email || ''} —
-          <strong>Site :</strong> ${user?.company?.website || ''} —
+          <strong>Site :</strong> ${user?.company?.cnss || ''} —
           <strong>ICE :</strong> ${user?.company?.ice || ''} —
           <strong>IF :</strong> ${user?.company?.if || ''} —
           <strong>RC :</strong> ${user?.company?.rc || ''} —
           <strong>CNSS :</strong> ${user?.company?.cnss || ''} —
-          <strong>Patente :</strong> ${user?.company?.patente || ''}
+          <strong>Patente :</strong> ${user?.company?.cnss || ''}
         </p>
       </div>
 
@@ -610,7 +610,7 @@ const generateTemplate3HTML = (type: 'invoice' | 'quote') => {
   `;
 };
   
-const generateTemplate4HTML = () => {
+  const generateTemplate4HTML = (type: 'invoice' | 'quote') => {
       return `
    <div style="background:#fff;max-width:900px;margin:0 auto;box-shadow:0 4px 15px rgba(0,0,0,0.1);border-radius:8px;font-family:Arial,sans-serif;">
     
@@ -757,9 +757,9 @@ const generateTemplate4HTML = () => {
     </div>
   </div>
   `;
-};
+}
 
-const generateTemplate5HTML = () => {
+  const generateTemplate5HTML = () => {
      return `
   <div style="background:white; max-width:900px; margin:auto; font-family:Arial, sans-serif; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1)">
     
@@ -911,14 +911,14 @@ const generateTemplate5HTML = () => {
         <strong>IF :</strong> ${user?.company.if || ""} |
         <strong>RC :</strong> ${user?.company.rc || ""} |
         <strong>CNSS :</strong> ${user?.company.cnss || ""} |
-        <strong> Patente :</strong> ${user?.company.patente || ""} |
+        <strong>Patente :</strong> ${user?.company.rc || ""} |
         <strong>EMAIL :</strong> ${user?.company.email || ""} |
         <strong>SITE WEB :</strong> ${user?.company.website || ""}
       </p>
     </div>
   </div>
   `;
-};
+}
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">

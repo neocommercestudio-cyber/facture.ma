@@ -1,64 +1,52 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { 
-  signInWithEmailAndPassword, 
+  User as FirebaseUser,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
-  User as FirebaseUser
+  onAuthStateChanged
 } from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
-export interface Company {
+interface Company {
   name: string;
   ice: string;
-  if?: string;
-  rc?: string;
-  cnss?: string;
-  patente: string;
-  email: string;
-  website: string;
-  phone?: string;
-  address?: string;
+  if: string;
+  rc: string;
+  cnss: string;
+  address: string;
+  phone: string;
   logo?: string;
-  activity?: string;
-  subscription: 'free' | 'pro';
-  expiryDate?: string;
-  subscriptionDate?: string;
   invoiceNumberingFormat?: string;
   invoicePrefix?: string;
   invoiceCounter?: number;
-  quoteCounter?: number;
   lastInvoiceYear?: number;
-  lastQuoteYear?: number;
   defaultTemplate?: string;
+  subscription?: 'free' | 'pro';
+  subscriptionDate?: string;
+  expiryDate?: string;
 }
 
-export interface User {
+interface User {
   id: string;
+  name: string;
   email: string;
-  name?: string;
-  role: 'user' | 'admin';
+  role: 'admin' | 'manager' | 'cashier';
   company: Company;
 }
 
 interface AuthContextType {
   user: User | null;
+  firebaseUser: FirebaseUser | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, companyData: Omit<Company, 'subscription'>) => Promise<boolean>;
+  register: (email: string, password: string, companyData: Company) => Promise<boolean>;
   logout: () => Promise<void>;
+  upgradeSubscription: () => Promise<void>;
   updateCompanySettings: (settings: Partial<Company>) => Promise<void>;
-  checkSubscriptionExpiry: () => void;
+  checkSubscriptionExpiry: () => Promise<void>;
+  isLoading: boolean;
   showExpiryAlert: boolean;
   setShowExpiryAlert: (show: boolean) => void;
   expiredDate: string | null;
@@ -66,49 +54,100 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showExpiryAlert, setShowExpiryAlert] = useState(false);
   const [expiredDate, setExpiredDate] = useState<string | null>(null);
+
+  const checkSubscriptionExpiry = async (userId: string, userData: any) => {
+    if (userData.subscription === 'pro' && userData.expiryDate) {
+      const currentDate = new Date();
+      const expiryDate = new Date(userData.expiryDate);
+      
+      if (currentDate > expiryDate) {
+        // L'abonnement a expiré, repasser en version gratuite
+        try {
+          await updateDoc(doc(db, 'entreprises', userId), {
+            subscription: 'free',
+            subscriptionDate: new Date().toISOString(),
+            expiryDate: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+          
+          // Mettre à jour l'état local
+          setUser(prevUser => {
+            if (prevUser) {
+              return {
+                ...prevUser,
+                company: {
+                  ...prevUser.company,
+                  subscription: 'free',
+                  subscriptionDate: new Date().toISOString(),
+                  expiryDate: new Date().toISOString()
+                }
+              };
+            }
+            return prevUser;
+          });
+          
+          // Préparer l'alerte d'expiration
+          setExpiredDate(userData.expiryDate);
+          setShowExpiryAlert(true);
+          
+        } catch (error) {
+          console.error('Erreur lors de la mise à jour de l\'expiration:', error);
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        setFirebaseUser(firebaseUser);
+        // Récupérer les données utilisateur depuis Firestore
         try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          const userDoc = await getDoc(doc(db, 'entreprises', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setUser({
               id: firebaseUser.uid,
+              name: userData.ownerName || firebaseUser.email?.split('@')[0] || 'Utilisateur',
               email: firebaseUser.email || '',
-              name: userData.name,
-              role: userData.role || 'user',
-              company: userData.company
+              role: 'admin',
+              company: {
+                name: userData.name,
+                ice: userData.ice,
+                if: userData.if,
+                rc: userData.rc,
+                cnss: userData.cnss,
+                address: userData.address,
+                phone: userData.phone,
+                logo: userData.logo,
+                invoiceNumberingFormat: userData.invoiceNumberingFormat,
+                invoicePrefix: userData.invoicePrefix,
+                invoiceCounter: userData.invoiceCounter,
+                lastInvoiceYear: userData.lastInvoiceYear,
+                defaultTemplate: userData.defaultTemplate || 'template1',
+                subscription: userData.subscription || 'free',
+                subscriptionDate: userData.subscriptionDate,
+                expiryDate: userData.expiryDate
+              }
             });
-            setIsAuthenticated(true);
+            
+            // Vérifier l'expiration de l'abonnement à chaque connexion
+            await checkSubscriptionExpiry(firebaseUser.uid, userData);
           }
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          console.error('Erreur lors de la récupération des données utilisateur:', error);
         }
       } else {
+        setFirebaseUser(null);
         setUser(null);
-        setIsAuthenticated(false);
       }
-      setLoading(false);
+      setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -116,129 +155,148 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setUser({
-          id: userCredential.user.uid,
-          email: userCredential.user.email || '',
-          name: userData.name,
-          role: userData.role || 'user',
-          company: userData.company
-        });
-        setIsAuthenticated(true);
-        return true;
-      }
-      return false;
+      await signInWithEmailAndPassword(auth, email, password);
+      return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Erreur de connexion:', error);
       return false;
     }
   };
 
-  const register = async (email: string, password: string, companyData: Omit<Company, 'subscription'>): Promise<boolean> => {
+  const register = async (email: string, password: string, companyData: Company): Promise<boolean> => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      const userData: User = {
-        id: userCredential.user.uid,
-        email: userCredential.user.email || '',
-        role: 'user',
-        company: {
-          ...companyData,
-          subscription: 'free',
-          subscriptionDate: new Date().toISOString(),
-          invoiceNumberingFormat: 'format2',
-          invoicePrefix: 'FAC',
-          invoiceCounter: 0,
-          quoteCounter: 0,
-          lastInvoiceYear: new Date().getFullYear(),
-          lastQuoteYear: new Date().getFullYear(),
-          defaultTemplate: 'template1'
-        }
-      };
+      const userId = userCredential.user.uid;
 
-      await setDoc(doc(db, 'users', userCredential.user.uid), userData);
-      
-      setUser(userData);
-      setIsAuthenticated(true);
+      // Sauvegarder les données de l'entreprise dans Firestore
+      await setDoc(doc(db, 'entreprises', userId), {
+        ...companyData,
+        ownerEmail: email,
+        ownerName: email.split('@')[0],
+        subscription: 'free',
+        subscriptionDate: new Date().toISOString(),
+        expiryDate: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
       return true;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Erreur lors de l\'inscription:', error);
       return false;
+    }
+  };
+
+  const upgradeSubscription = async (): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      const currentDate = new Date();
+      const expiryDate = new Date();
+      expiryDate.setDate(currentDate.getDate() + 30); // 30 jours à partir d'aujourd'hui
+      
+      await updateDoc(doc(db, 'entreprises', user.id), {
+        subscription: 'pro',
+        subscriptionDate: currentDate.toISOString(),
+        expiryDate: expiryDate.toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      
+      // Mettre à jour l'état local
+      setUser(prevUser => {
+        if (prevUser) {
+          return {
+            ...prevUser,
+            company: {
+              ...prevUser.company,
+              subscription: 'pro',
+              subscriptionDate: currentDate.toISOString(),
+              expiryDate: expiryDate.toISOString()
+            }
+          };
+        }
+        return prevUser;
+      });
+      
+    } catch (error) {
+      console.error('Erreur lors de la mise à niveau:', error);
+      throw error;
+    }
+  };
+
+  const updateCompanySettings = async (settings: Partial<Company>): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      await updateDoc(doc(db, 'entreprises', user.id), {
+        ...settings,
+        updatedAt: new Date().toISOString()
+      });
+      
+      // Mettre à jour l'état local immédiatement
+      setUser(prevUser => {
+        if (prevUser) {
+          return {
+            ...prevUser,
+            company: {
+              ...prevUser.company,
+              ...settings
+            }
+          };
+        }
+        return prevUser;
+      });
+      
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des paramètres:', error);
+      throw error;
+    }
+  };
+  const checkSubscriptionExpiryManual = async (): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      const userDoc = await getDoc(doc(db, 'entreprises', user.id));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        await checkSubscriptionExpiry(user.id, userData);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification de l\'expiration:', error);
     }
   };
 
   const logout = async (): Promise<void> => {
     try {
       await signOut(auth);
-      setUser(null);
-      setIsAuthenticated(false);
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Erreur lors de la déconnexion:', error);
     }
   };
 
-  const updateCompanySettings = async (settings: Partial<Company>): Promise<void> => {
-    if (!user) return;
-
-    try {
-      const updatedCompany = { ...user.company, ...settings };
-      const updatedUser = { ...user, company: updatedCompany };
-
-      await updateDoc(doc(db, 'users', user.id), {
-        company: updatedCompany
-      });
-
-      setUser(updatedUser);
-    } catch (error) {
-      console.error('Error updating company settings:', error);
-      throw error;
-    }
-  };
-
-  const checkSubscriptionExpiry = () => {
-    if (!user?.company.expiryDate) return;
-
-    const expiryDate = new Date(user.company.expiryDate);
-    const now = new Date();
-    const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (user.company.subscription === 'pro' && daysUntilExpiry <= 7 && daysUntilExpiry > 0) {
-      setExpiredDate(user.company.expiryDate);
-      setShowExpiryAlert(true);
-    } else if (user.company.subscription === 'pro' && daysUntilExpiry <= 0) {
-      // Subscription expired, downgrade to free
-      updateCompanySettings({ subscription: 'free' });
-    }
-  };
-
-  const value: AuthContextType = {
+  const value = {
     user,
-    isAuthenticated,
+    firebaseUser,
+    isAuthenticated: !!user,
     login,
     register,
     logout,
+    upgradeSubscription,
     updateCompanySettings,
-    checkSubscriptionExpiry,
+    checkSubscriptionExpiry: checkSubscriptionExpiryManual,
+    isLoading,
     showExpiryAlert,
     setShowExpiryAlert,
-    expiredDate
+    expiredDate,
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600"></div>
-      </div>
-    );
-  }
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }

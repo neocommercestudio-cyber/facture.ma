@@ -180,7 +180,12 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
       {/* FOOTER */}
       <div className="bg-[#0a1f44] text-white p-6 text-center text-sm relative z-10">
         <p>
-          <strong>{user?.company.name}</strong> | {user?.company.address} | <strong>Tél :</strong> {user?.company.phone} | <strong>ICE :</strong> {user?.company.ice} | <strong> IF:</strong> {user?.company.if} | <strong> RC:</strong> {user?.company.rc} | <strong> CNSS:</strong> {user?.company.cnss} | <strong> Patente :</strong> {user?.company.patente} | <strong> EMAIL :</strong> {user?.company.email} | <strong> SITE WEB :</strong> {user?.company.website}
+          <strong>{user?.company.name}</strong> | {user?.company.address} |{' '}
+          <strong>Tél :</strong> {user?.company.phone} | <strong>ICE :</strong>{' '}
+          {user?.company.ice} | <strong> IF:</strong> {user?.company.if} |{' '}
+          <strong> RC:</strong> {user?.company.rc} | <strong> CNSS:</strong>{' '}
+          {user?.company.cnss} | <strong> Patente :</strong> {user?.company.rc}{' '}
+          | <strong> EMAIL :</strong> | <strong> SITE WEB :</strong>
         </p>
       </div>
     </div>

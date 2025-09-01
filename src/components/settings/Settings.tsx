@@ -16,9 +16,6 @@ export default function Settings() {
     if: '',
     rc: '',
     cnss: '',
-    patente: '',
-    email: '',
-    website: '',
     phone: '',
     address: '',
     logo: ''
@@ -41,9 +38,6 @@ export default function Settings() {
         if: user.company.if || '',
         rc: user.company.rc || '',
         cnss: user.company.cnss || '',
-        patente: user.company.patente || '',
-        email: user.company.email || '',
-        website: user.company.website || '',
         phone: user.company.phone || '',
         address: user.company.address || '',
         logo: user.company.logo || ''
@@ -132,9 +126,6 @@ export default function Settings() {
         if: companyData.if,
         rc: companyData.rc,
         cnss: companyData.cnss,
-        patente: companyData.patente,
-        email: companyData.email,
-        website: companyData.website,
         phone: companyData.phone,
         address: companyData.address,
         logo: companyData.logo
@@ -220,45 +211,6 @@ export default function Settings() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Patente *
-                </label>
-                <input
-                  type="text"
-                  value={companyData.patente}
-                  onChange={(e) => handleCompanyDataChange('patente', e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  placeholder="12345678"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email de l'entreprise *
-                </label>
-                <input
-                  type="email"
-                  value={companyData.email}
-                  onChange={(e) => handleCompanyDataChange('email', e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  placeholder="contact@entreprise.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Site web *
-                </label>
-                <input
-                  type="url"
-                  value={companyData.website}
-                  onChange={(e) => handleCompanyDataChange('website', e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  placeholder="https://www.entreprise.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   CNSS
                 </label>
                 <input
@@ -266,7 +218,6 @@ export default function Settings() {
                   value={companyData.cnss}
                   onChange={(e) => handleCompanyDataChange('cnss', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  placeholder="1234567"
                 />
               </div>
               <div>
