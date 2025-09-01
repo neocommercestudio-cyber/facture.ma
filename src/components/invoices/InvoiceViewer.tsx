@@ -56,16 +56,22 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
   };
 
   const generatePDFWithTemplate = () => {
-    // Obtenir le contenu directement depuis l'élément affiché
-    const invoiceContent = document.getElementById('invoice-content');
-    if (!invoiceContent) {
-      alert('Erreur: Contenu de la facture non trouvé');
-      return;
-    }
+    // Créer un élément temporaire avec le HTML du template sélectionné
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'fixed';
+    tempDiv.style.top = '0';
+    tempDiv.style.left = '0';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.minHeight = '297mm';
+    tempDiv.style.backgroundColor = 'white';
+    tempDiv.style.zIndex = '-1';
+    tempDiv.style.opacity = '0';
+    tempDiv.innerHTML = generateTemplateHTMLWithSelectedTemplate();
+    document.body.appendChild(tempDiv);
 
     // Options pour html2pdf
     const options = {
-      margin: [5, 5, 5, 5],
+      margin: [10, 10, 25, 10], // Top, Left, Bottom, Right - Plus d'espace en bas pour le footer
       filename: `Facture_${invoice.number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
@@ -74,23 +80,31 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
         allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 800,
-        height: 1200
+        width: 794, // Largeur A4 en pixels (210mm)
+        height: 1123 // Hauteur A4 en pixels (297mm)
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
-        orientation: 'portrait' 
+        orientation: 'portrait',
+        putOnlyUsedFonts: true
       }
     };
 
     // Générer et télécharger le PDF
     html2pdf()
       .set(options)
-      .from(invoiceContent)
+      .from(tempDiv)
       .save()
+      .then(() => {
+        // Nettoyer l'élément temporaire
+        document.body.removeChild(tempDiv);
+      })
       .catch((error) => {
         console.error('Erreur lors de la génération du PDF:', error);
+        if (document.body.contains(tempDiv)) {
+          document.body.removeChild(tempDiv);
+        }
         alert('Erreur lors de la génération du PDF');
       });
   };
@@ -163,93 +177,90 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
       </html>
     `;
   };
+
 const generateTemplate1HTML = () => {
-
   return `
-  <div style="background: #fff; max-width: 900px; margin: auto; border: 1px solid #d1d5db; font-family: Arial, sans-serif;">
-    
-    <!-- HEADER -->
-    <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 24px;">
-          ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" style="height: 80px;" />` : ''}
-          <div>
-            <h2 style="font-size: 35px; font-weight: bold; color: #111827; margin: 0;">${user?.company?.name || ''}</h2>
-            <p style="font-size: 15px; color: #4b5563; margin: 2px 0;">${user?.company?.activity || ''}</p>
-            <p style="font-size: 15px; color: #4b5563; margin: 2px 0;">${user?.company?.address || ''}</p>
+    <div style="background:white; max-width:800px; margin:0 auto; border:1px solid black; font-family: Arial, sans-serif;">
+      
+      <!-- HEADER -->
+      <div style="padding:10px; border-bottom:1px solid black; background:black; color:white; text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          
+          <!-- Logo -->
+          ${user?.company?.logo ? `<img src="${user.company.logo}" alt="Logo" style="height:115px; width:auto;" />` : ''}
+
+          <!-- Nom de l'entreprise centré -->
+          <div style="flex:1; text-align:center;">
+            <h2 style="font-size:38px; font-weight:800; margin:0;">${user?.company?.name || ''}</h2>
+            <h1 style="font-size:25px; font-weight:bold; margin-top:8px;">Facture</h1>
           </div>
-        </div>
-        <div style="text-align: right;">
-          <h1 style="font-size: 28px; font-weight: bold; color: #111827; margin: 0;">Facture</h1>
+          <div style="width:115px;"></div>
         </div>
       </div>
-    </div>
 
-    <!-- CLIENT + DATES -->
-    <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-        
-        <!-- Client -->
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-          <h3 style="font-weight: bold; font-size: 18px; text-align: center; margin: 0 0 15px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
-            CLIENT : ${invoice.client.name} ${invoice.client.address || ''}
-          </h3>
-          <p style="font-size: 14px; color: #374151; text-align: center; margin: 4px 0;"><strong>ICE:</strong> ${invoice.client.ice || ''}</p>
-        </div>
+      <!-- CLIENT + DATES -->
+      <div style="padding:30px; border-bottom:1px solid black;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          
+          <div style="background:#f8f9fa; padding:20px; border-radius:8px; border:1px solid black; text-align:center;">
+            <h3 style="font-weight:bold; font-size:18px; color:black; margin-bottom:15px; border-bottom:1px solid black; padding-bottom:8px;">
+              CLIENT : ${invoice.client.name} ${invoice.client.address}
+            </h3>
+            <p style="font-size:14px; color:black; margin:4px 0;"><strong>ICE:</strong> ${invoice.client.ice}</p>
+          </div>
 
-        <!-- Dates -->
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-          <h3 style="font-weight: bold; font-size: 18px; text-align: center; margin: 0 0 15px 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #111827;">
-            DATES : ${new Date(invoice.date).toLocaleDateString('fr-FR')}
-          </h3>
-          <p style="font-size: 14px; color: #374151; text-align: center; margin: 4px 0;">
-            <strong>Facture N° :</strong> ${invoice.number}
-          </p>
+          <div style="background:#f8f9fa; padding:20px; border-radius:8px; border:1px solid black; text-align:center;">
+            <h3 style="font-weight:bold; font-size:18px; color:black; margin-bottom:15px; border-bottom:1px solid black; padding-bottom:8px;">
+              DATE : ${new Date(invoice.date).toLocaleDateString('fr-FR')}
+            </h3>
+            <p style="font-size:14px; color:black; margin:4px 0;"><strong>Facture N° :</strong> ${invoice.number}</p>
+          </div>
+
         </div>
       </div>
-    </div>
 
-    <!-- TABLE PRODUITS -->
-    <div style="padding: 30px; border-bottom: 1px solid #d1d5db;">
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead style="background: #f3f4f6;">
-          <tr>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">DÉSIGNATION</th>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">QUANTITÉ</th>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">P.U. HT</th>
-            <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: bold;">TOTAL HT</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${invoice.items.map((item: any) => `
-            <tr>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.description}</td>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.quantity.toFixed(3)}</td>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.unitPrice.toFixed(2)} MAD</td>
-              <td style="border: 1px solid #e5e7eb; padding: 15px; text-align: center;">${item.total.toFixed(2)} MAD</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- TOTALS -->
-    <div style="padding: 30px;">
-      <div style="display: flex; justify-content: space-between; gap: 30px;">
-        
-        <!-- Bloc gauche -->
-        <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px;">
-          <p style="font-size: 18px; font-weight: bold;text-align:center; margin-bottom: 18px;">Arrêtée la présente facture à la somme de :</p>
-          <p style="font-size: 18px; margin: 0;">• ${invoice.totalInWords}</p>
+      <!-- TABLE PRODUITS -->
+      <div style="padding:30px; border-bottom:1px solid black;">
+        <div style="border:1px solid black; border-radius:8px; overflow:hidden;">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead style="background:black; color:white;">
+              <tr>
+                <th style="border-right:1px solid white; padding:15px; text-align:center; font-weight:bold;">DÉSIGNATION</th>
+                <th style="border-right:1px solid white; padding:15px; text-align:center; font-weight:bold;">QUANTITÉ</th>
+                <th style="border-right:1px solid white; padding:15px; text-align:center; font-weight:bold;">P.U. HT</th>
+                <th style="padding:15px; text-align:center; font-weight:bold;">TOTAL HT</th>
+              </tr>
+            </thead>
+            <tbody>
+           ${invoice.items.map((item, index) => `
+                <tr style="border-top:1px solid black; background:${index % 2 === 0 ? 'white' : '#f8f9fa'};">
+                  <td style="border-right:1px solid black; padding:15px; text-align:center;">${item.description}</td>
+                  <td style="border-right:1px solid black; padding:15px; text-align:center;">${item.quantity.toFixed(3)}</td>
+                  <td style="border-right:1px solid black; padding:15px; text-align:center;">${item.unitPrice.toFixed(2)} MAD</td>
+                  <td style="padding:15px; text-align:center; font-weight:500;">${item.total.toFixed(2)} MAD</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
         </div>
+      </div>
 
-        <!-- Bloc droit -->
-        <div style="width: 45%; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px;">
-            <span>Total HT :</span>
-            <span><strong>${invoice.subtotal.toFixed(2)} MAD</strong></span>
+      <!-- TOTALS -->
+      <div style="padding:30px;">
+        <div style="display:flex; justify-content:space-between;">
+          
+          <!-- Bloc gauche -->
+          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:18px; text-align:center;">
+            <p style="font-size:14px; font-weight:bold; margin-bottom:15px;">Arrêtée la présente facture à la somme de :</p>
+            <p style="font-size:14px; border-top:1px solid black; padding-top:8px; margin:0;">• ${invoice.totalInWords}</p>
           </div>
-         <div style="margin-bottom:10px; font-size:18px;">
+
+          <!-- Bloc droit -->
+          <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+              <span>Total HT :</span><span style="font-weight:500;">${invoice.subtotal.toFixed(2)} MAD</span>
+            </div>
+           <div style="margin-bottom:10px; font-size:18px;">
   ${(() => {
     // Grouper les TVA
     const vatGroups = invoice.items.reduce((acc, item) => {
@@ -278,42 +289,38 @@ const generateTemplate1HTML = () => {
   })()}
 </div>
 
-
-
-          
-          <div style="display: flex; justify-content: space-between; border-top: 1px solid #d1d5db; padding-top: 15px; font-weight: bold; font-size: 18px;">
-            <span>TOTAL TTC :</span>
-            <span>${invoice.totalTTC.toFixed(2)} MAD</span>
+            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:bold; border-top:1px solid black; padding-top:10px;">
+              <span>TOTAL TTC :</span><span>${invoice.totalTTC.toFixed(2)} MAD</span>
+            </div>
           </div>
+
         </div>
       </div>
-    </div>
 
-    <!-- SIGNATURE -->
-    <div style="padding: 10px;">
-      <div style="width: 300px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
-        <div style="font-weight: bold; margin-bottom: 18px;">Signature</div>
-        <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 120px;"></div>
+      <!-- SIGNATURE -->
+      <div style="padding:15px;">
+        <div style="width:300px; background:#f8f9fa; border:1px solid black; border-radius:8px; padding:20px; text-align:center;">
+          <p style="font-size:18px; font-weight:bold; margin-bottom:15px;">Signature</p>
+          <div style="border:2px solid black; border-radius:8px; height:100px;"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- FOOTER -->
-    <div style="background: #f3f4f6; border-top: 2px solid #9ca3af; padding: 20px;text-align:center; font-size: 18px; color: #374151; ">
-
-
+      <!-- FOOTER -->
+      <div style="background:black; color:white; border-top:2px solid white; padding:20px; text-align:center; font-size:14px;">
         <p style="margin:0;">
-        <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} 
-        <strong>Tél :</strong> ${user?.company?.phone || ''} - 
-        <strong>Email :</strong> ${user?.company?.email || ''} - 
-        <strong>Site:</strong> ${user?.company?.website || ''} - 
-        <strong>ICE:</strong> ${user?.company?.ice || ''} - 
-        <strong>IF:</strong> ${user?.company?.if || ''} - 
-        <strong>RC:</strong> ${user?.company?.rc || ''} - 
-        <strong>CNSS:</strong> ${user?.company?.cnss || ''} - 
-        <strong>Patente:</strong> ${user?.company?.patente || ''}
-      </p>
+          <strong>${user?.company?.name || ''}</strong> ${user?.company?.address || ''} —
+          <strong>Tél :</strong> ${user?.company?.phone || ''} —
+          <strong>Email :</strong> ${user?.company?.email || ''} —
+          <strong>Site:</strong> ${user?.company?.website || ''} —
+          <strong>ICE :</strong> ${user?.company?.ice || ''} —
+          <strong>IF :</strong> ${user?.company?.if || ''} —
+          <strong>RC :</strong> ${user?.company?.rc || ''} —
+          <strong>CNSS :</strong> ${user?.company?.cnss || ''} —
+          <strong>Patente :</strong> ${user?.company?.patente || ''}
+        </p>
+      </div>
+
     </div>
-  </div>
   `;
 };
 
