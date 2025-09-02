@@ -20,6 +20,7 @@ export default function InvoicesList() {
   const [showProModal, setShowProModal] = useState(false);
   const [blockedTemplateName, setBlockedTemplateName] = useState('');
   const [showUpgradePage, setShowUpgradePage] = useState(false);
+  const [statusModalInvoice, setStatusModalInvoice] = useState<string | null>(null);
 
   const isTemplateProOnly = (templateId: string = 'template1') => {
     const proTemplates = ['template2', 'template3', 'template4', 'template5'];
