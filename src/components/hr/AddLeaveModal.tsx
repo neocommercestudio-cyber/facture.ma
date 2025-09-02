@@ -18,6 +18,8 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
     reason: '',
     includeSaturdays: false,
     manualHolidays: 0
+    includeSaturdays: false,
+    manualHolidays: 0
   });
 
   const leaveTypes = [
@@ -27,6 +29,43 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
     { value: 'other', label: 'Autre' }
   ];
 
+  const calculateWorkingDays = () => {
+    if (!formData.startDate || !formData.endDate) return 0;
+    
+    const start = new Date(formData.startDate);
+    const end = new Date(formData.endDate);
+    
+    if (end < start) return 0;
+    
+    let workingDays = 0;
+    const currentDate = new Date(start);
+    
+    while (currentDate <= end) {
+      const dayOfWeek = currentDate.getDay(); // 0 = Dimanche, 6 = Samedi
+      
+      // Exclure les dimanches (toujours)
+      if (dayOfWeek === 0) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        continue;
+      }
+      
+      // Exclure les samedis si l'option n'est pas cochée
+      if (dayOfWeek === 6 && !formData.includeSaturdays) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        continue;
+      }
+      
+      workingDays++;
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    // Soustraire les jours fériés saisis manuellement
+    return Math.max(0, workingDays - formData.manualHolidays);
+  };
+
+  const workingDays = calculateWorkingDays();
+  const totalCalendarDays = formData.startDate && formData.endDate ? 
+    Math.ceil((new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1 : 0;
   const calculateWorkingDays = () => {
     if (!formData.startDate || !formData.endDate) return 0;
     
@@ -77,6 +116,10 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
       alert('La date de fin doit être après la date de début');
       return;
     }
+    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+      alert('La date de fin doit être après la date de début');
+      return;
+    }
 
     const employee = getEmployeeById(formData.employeeId);
     if (!employee) {
@@ -102,6 +145,8 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
       type: 'annual',
       status: 'pending',
       reason: '',
+      includeSaturdays: false,
+      manualHolidays: 0
       includeSaturdays: false,
       manualHolidays: 0
     });
@@ -204,22 +249,43 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type de congé
-            </label>
-            <select
-              name="type"
-              value={formData.type}
+        <div>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name="includeSaturdays"
+              checked={formData.includeSaturdays}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            >
-              {leaveTypes.map(type => (
-                <option key={type.value} value={type.value}>{type.label}</option>
-              ))}
-            </select>
-          </div>
+              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+            />
+            <span className="text-sm text-gray-700">Inclure les samedis comme jours travaillés</span>
+          </label>
+          <p className="text-xs text-gray-500 mt-1">
+            Par défaut, seuls les dimanches sont exclus du calcul
+          </p>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Nombre de jours fériés dans cette période
+          </label>
+          <input
+            type="number"
+            name="manualHolidays"
+            value={formData.manualHolidays}
+            onChange={handleChange}
+            min="0"
+            max="10"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="0"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Saisissez manuellement le nombre de jours fériés qui tombent dans cette période de congé
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         
           
          
         </div>
@@ -238,6 +304,23 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
           />
         </div>
 
+        {workingDays > 0 && (
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-purple-800 font-medium">Jours ouvrés calculés:</span>
+              <span className="text-purple-900 font-bold">{workingDays} jour{workingDays > 1 ? 's' : ''}</span>
+            </div>
+            <div className="text-xs text-purple-700 space-y-1">
+              <p>• Période totale: {totalCalendarDays} jour{totalCalendarDays > 1 ? 's' : ''} calendaires</p>
+              <p>• Dimanches exclus automatiquement</p>
+              <p>• Samedis {formData.includeSaturdays ? 'inclus' : 'exclus'}</p>
+              <p>• Jours fériés saisis manuellement: {formData.manualHolidays}</p>
+              {formData.manualHolidays > 0 && (
+                <p className="text-purple-600 font-medium">→ Jours fériés déduits du calcul</p>
+              )}
+            </div>
+          </div>
+        )}
         {workingDays > 0 && (
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 space-y-2">
             <div className="flex justify-between items-center">
