@@ -35,7 +35,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
 )}
 
           <div className="flex-1 text-center">
-            <h1 className="text-5xl font-extrabold uppercase tracking-wide">
+            <h1 className="text-4xl font-extrabold uppercase tracking-wide">
               {user?.company.name}
             </h1>
             <h2 className="text-3xl font-semibold mt-5 tracking-widest">
