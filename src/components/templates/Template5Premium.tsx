@@ -11,6 +11,13 @@ export default function Template5Premium({ data, type }: TemplateProps) {
   const { user } = useAuth();
   const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
 
+  // Fonction pour récupérer l'unité d'un produit
+  const getProductUnit = (productName: string) => {
+    // Cette fonction sera utilisée dans le contexte où les produits sont disponibles
+    // Pour l'instant, on retourne une unité par défaut
+    return 'unité';
+  };
+
   return (
     <div
       className="bg-white max-w-4xl mx-auto shadow-lg rounded overflow-hidden"
