@@ -103,7 +103,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
             <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             <p className="text-sm font-bold border-t border-[#03224C] pt-2 text-[#03224C]">• {data.totalInWords}</p>
           </div>
-
+ </div>
           {/* Bloc droit */}
           <div className="w-80 bg-gray-50 rounded border border-[#0a1f44] p-4">
             <div className="flex justify-between mb-2 text-sm">
