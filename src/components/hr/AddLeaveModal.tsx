@@ -15,7 +15,8 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
     endDate: '',
     type: 'annual' as const,
     status: 'pending' as const,
-    reason: ''
+    reason: '',
+    includeSaturdays: false
   });
 
   const leaveTypes = [
@@ -25,18 +26,63 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
     { value: 'other', label: 'Autre' }
   ];
 
-  const calculateDays = () => {
+  const calculateWorkingDays = () => {
     if (!formData.startDate || !formData.endDate) return 0;
     
     const start = new Date(formData.startDate);
     const end = new Date(formData.endDate);
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de fin
     
-    return diffDays;
+    if (end < start) return 0;
+    
+    let workingDays = 0;
+    const currentDate = new Date(start);
+    
+    // Jours fériés fixes au Maroc (approximatifs)
+    const publicHolidays = [
+      '01-01', // Nouvel An
+      '01-11', // Manifeste de l'Indépendance
+      '05-01', // Fête du Travail
+      '07-30', // Fête du Trône
+      '08-14', // Journée Oued Ed-Dahab
+      '08-20', // Révolution du Roi et du Peuple
+      '08-21', // Fête de la Jeunesse
+      '11-06', // Marche Verte
+      '11-18'  // Fête de l'Indépendance
+    ];
+    
+    while (currentDate <= end) {
+      const dayOfWeek = currentDate.getDay(); // 0 = Dimanche, 6 = Samedi
+      const monthDay = String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                      String(currentDate.getDate()).padStart(2, '0');
+      
+      // Exclure les dimanches (toujours)
+      if (dayOfWeek === 0) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        continue;
+      }
+      
+      // Exclure les samedis si l'option n'est pas cochée
+      if (dayOfWeek === 6 && !formData.includeSaturdays) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        continue;
+      }
+      
+      // Exclure les jours fériés
+      if (publicHolidays.includes(monthDay)) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        continue;
+      }
+      
+      workingDays++;
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return workingDays;
   };
 
-  const days = calculateDays();
+  const workingDays = calculateWorkingDays();
+  const totalCalendarDays = formData.startDate && formData.endDate ? 
+    Math.ceil((new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1 : 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +109,7 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
       startDate: formData.startDate,
       endDate: formData.endDate,
       type: formData.type,
-      days,
+      days: workingDays,
       status: formData.status,
       reason: formData.reason
     });
@@ -74,16 +120,17 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
       endDate: '',
       type: 'annual',
       status: 'pending',
-      reason: ''
+      reason: '',
+      includeSaturdays: false
     });
     onClose();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target as HTMLInputElement;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     });
   };
 
@@ -140,6 +187,22 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
           </div>
         </div>
         
+        <div>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name="includeSaturdays"
+              checked={formData.includeSaturdays}
+              onChange={handleChange}
+              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+            />
+            <span className="text-sm text-gray-700">Inclure les samedis comme jours travaillés</span>
+          </label>
+          <p className="text-xs text-gray-500 mt-1">
+            Par défaut, les dimanches et jours fériés sont exclus du calcul
+          </p>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -188,11 +251,18 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
           />
         </div>
 
-        {days > 0 && (
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <p className="text-purple-800 font-medium">
-              Durée calculée: {days} jour{days > 1 ? 's' : ''}
-            </p>
+        {workingDays > 0 && (
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-purple-800 font-medium">Jours ouvrés calculés:</span>
+              <span className="text-purple-900 font-bold">{workingDays} jour{workingDays > 1 ? 's' : ''}</span>
+            </div>
+            <div className="text-xs text-purple-700 space-y-1">
+              <p>• Période totale: {totalCalendarDays} jour{totalCalendarDays > 1 ? 's' : ''} calendaires</p>
+              <p>• Dimanches exclus automatiquement</p>
+              <p>• Samedis {formData.includeSaturdays ? 'inclus' : 'exclus'}</p>
+              <p>• Jours fériés marocains exclus</p>
+            </div>
           </div>
         )}
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   UserCheck, 
   Users, 
@@ -15,7 +16,8 @@ import {
   CheckCircle,
   XCircle,
   AlertTriangle,
-  LayoutDashboard
+  LayoutDashboard,
+  Crown
 } from 'lucide-react';
 import AddEmployeeModal from './AddEmployeeModal';
 import AddOvertimeModal from './AddOvertimeModal';
@@ -25,18 +27,62 @@ import html2pdf from 'html2pdf.js';
 
 export default function HRManagement() {
   const { employees, overtimes, leaves, deleteEmployee, deleteOvertime, deleteLeave } = useData();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState('all');
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
   const [isAddOvertimeModalOpen, setIsAddOvertimeModalOpen] = useState(false);
   const [isAddLeaveModalOpen, setIsAddLeaveModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<string | null>(null);
 
+  // Vérifier l'accès PRO
+  const isProActive = user?.company.subscription === 'pro' && user?.company.expiryDate && 
+    new Date(user.company.expiryDate) > new Date();
+
+  if (!isProActive) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Crown className="w-10 h-10 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            🔒 Fonctionnalité PRO
+          </h2>
+          <p className="text-gray-600 mb-6">
+            La Gestion Humaine est réservée aux abonnés PRO. 
+            Passez à la version PRO pour accéder à cette fonctionnalité avancée.
+          </p>
+          <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200">
+            <span className="flex items-center justify-center space-x-2">
+              <Crown className="w-5 h-5" />
+              <span>Passer à PRO - 299 MAD/mois</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Calculs pour le dashboard
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   
-  const monthlyOvertimes = overtimes.filter(overtime => {
+  // Filtrer par employé sélectionné
+  const filteredOvertimes = selectedEmployee === 'all' 
+    ? overtimes 
+    : overtimes.filter(overtime => overtime.employeeId === selectedEmployee);
+
+  const filteredLeaves = selectedEmployee === 'all' 
+    ? leaves 
+    : leaves.filter(leave => leave.employeeId === selectedEmployee);
+
+  const filteredEmployees = selectedEmployee === 'all' 
+    ? employees 
+    : employees.filter(employee => employee.id === selectedEmployee);
+
+  const monthlyOvertimes = filteredOvertimes.filter(overtime => {
     const overtimeDate = new Date(overtime.date);
     return overtimeDate.getMonth() === currentMonth && overtimeDate.getFullYear() === currentYear;
   });
@@ -44,15 +90,15 @@ export default function HRManagement() {
   const totalOvertimeHours = monthlyOvertimes.reduce((sum, overtime) => sum + overtime.hours, 0);
   const totalOvertimeCost = monthlyOvertimes.reduce((sum, overtime) => sum + overtime.total, 0);
   
-  const totalBaseSalary = employees.reduce((sum, employee) => sum + employee.baseSalary, 0);
+  const totalBaseSalary = filteredEmployees.reduce((sum, employee) => sum + employee.baseSalary, 0);
   const totalMonthlyCost = totalBaseSalary + totalOvertimeCost;
   
-  const approvedLeaves = leaves.filter(leave => leave.status === 'approved');
+  const approvedLeaves = filteredLeaves.filter(leave => leave.status === 'approved');
   const totalLeaveDaysTaken = approvedLeaves.reduce((sum, leave) => sum + leave.days, 0);
-  const totalLeaveAllowance = employees.reduce((sum, employee) => sum + employee.annualLeaveDays, 0);
+  const totalLeaveAllowance = filteredEmployees.reduce((sum, employee) => sum + employee.annualLeaveDays, 0);
   const remainingLeaveDays = totalLeaveAllowance - totalLeaveDaysTaken;
 
-  const filteredEmployees = employees.filter(employee =>
+  const searchFilteredEmployees = filteredEmployees.filter(employee =>
     `${employee.firstName} ${employee.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -211,21 +257,41 @@ export default function HRManagement() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
             <UserCheck className="w-8 h-8 text-blue-600" />
             <span>Gestion Humaine</span>
+            <Crown className="w-6 h-6 text-yellow-500" />
           </h1>
           <p className="text-gray-600 mt-2">
-            La section Gestion Humaine vous permet de suivre vos employés, leurs heures supplémentaires et leurs congés.
+            La section Gestion Humaine vous permet de suivre vos employés, leurs heures supplémentaires et leurs congés. Fonctionnalité réservée aux abonnés PRO.
           </p>
         </div>
-        <button
-          onClick={exportHRReport}
-          className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
-        >
-          <Download className="w-4 h-4" />
-          <span>Export PDF</span>
-        </button>
+        <div className="flex items-center space-x-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filtrer par employé
+            </label>
+            <select
+              value={selectedEmployee}
+              onChange={(e) => setSelectedEmployee(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">Tous les employés</option>
+              {employees.map(employee => (
+                <option key={employee.id} value={employee.id}>
+                  {employee.firstName} {employee.lastName} - {employee.position}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={exportHRReport}
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+          >
+            <Download className="w-4 h-4" />
+            <span>Export PDF</span>
+          </button>
+        </div>
       </div>
 
       {/* Navigation Tabs */}
@@ -264,8 +330,10 @@ export default function HRManagement() {
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{employees.length}</p>
-                  <p className="text-sm text-gray-600">Employés Total</p>
+                  <p className="text-2xl font-bold text-gray-900">{filteredEmployees.length}</p>
+                  <p className="text-sm text-gray-600">
+                    {selectedEmployee === 'all' ? 'Employés Total' : 'Employé Sélectionné'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -310,7 +378,9 @@ export default function HRManagement() {
           {/* Breakdown */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Répartition des Coûts</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Répartition des Coûts {selectedEmployee !== 'all' && `- ${employees.find(e => e.id === selectedEmployee)?.firstName} ${employees.find(e => e.id === selectedEmployee)?.lastName}`}
+              </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                   <span className="font-medium text-gray-900">Salaires de base</span>
@@ -328,7 +398,9 @@ export default function HRManagement() {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Congés</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Congés {selectedEmployee !== 'all' && `- ${employees.find(e => e.id === selectedEmployee)?.firstName} ${employees.find(e => e.id === selectedEmployee)?.lastName}`}
+              </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                   <span className="font-medium text-gray-900">Total alloué</span>
@@ -405,7 +477,7 @@ export default function HRManagement() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredEmployees.map((employee) => {
+                  {searchFilteredEmployees.map((employee) => {
                     const overtimeStats = getEmployeeOvertimeStats(employee.id);
                     const leaveStats = getEmployeeLeaveStats(employee.id);
                     
@@ -466,7 +538,7 @@ export default function HRManagement() {
               </table>
             </div>
 
-            {filteredEmployees.length === 0 && (
+            {searchFilteredEmployees.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500">Aucun employé trouvé</p>
               </div>
@@ -516,7 +588,7 @@ export default function HRManagement() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {overtimes.map((overtime) => (
+                  {filteredOvertimes.map((overtime) => (
                     <tr key={overtime.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
@@ -550,9 +622,13 @@ export default function HRManagement() {
               </table>
             </div>
 
-            {overtimes.length === 0 && (
+            {filteredOvertimes.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-gray-500">Aucune heure supplémentaire enregistrée</p>
+                <p className="text-gray-500">
+                  {selectedEmployee === 'all' 
+                    ? 'Aucune heure supplémentaire enregistrée' 
+                    : 'Aucune heure supplémentaire pour cet employé'}
+                </p>
               </div>
             )}
           </div>
@@ -600,7 +676,7 @@ export default function HRManagement() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {leaves.map((leave) => (
+                  {filteredLeaves.map((leave) => (
                     <tr key={leave.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
@@ -650,9 +726,13 @@ export default function HRManagement() {
               </table>
             </div>
 
-            {leaves.length === 0 && (
+            {filteredLeaves.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-gray-500">Aucun congé enregistré</p>
+                <p className="text-gray-500">
+                  {selectedEmployee === 'all' 
+                    ? 'Aucun congé enregistré' 
+                    : 'Aucun congé pour cet employé'}
+                </p>
               </div>
             )}
           </div>
