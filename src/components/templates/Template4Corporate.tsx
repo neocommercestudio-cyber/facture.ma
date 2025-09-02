@@ -35,7 +35,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
 )}
 
           <div className="flex-1 text-center">
-            <h1 className="text-4xl font-extrabold uppercase tracking-wide">
+            <h1 className="text-5xl font-extrabold uppercase tracking-wide">
               {user?.company.name}
             </h1>
             <h2 className="text-3xl font-semibold mt-5 tracking-widest">
@@ -64,19 +64,19 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
       <div className="p-8 border-b border-[#24445C]">
         <div className="grid grid-cols-2 gap-8">
           <div className="bg-gray-50 p-6 rounded border border-[#24445C]">
-            <h3 className="font-bold text-lg text-[#24445C] mb-3 border-b border-[#24445C] pb-2 text-center">
+            <h3 className="font-bold text-sm text-[#24445C] mb-3 border-b border-[#24445C] pb-2 text-center">
               CLIENT : {data.client.name} {data.client.address}
             </h3>
-            <div className="text-lg text-black space-y-1 text-center">
+            <div className="text-sm text-black space-y-1 text-center">
               <p><strong>ICE:</strong> {data.client.ice}</p>
             </div>
           </div>
 
           <div className="bg-gray-50 p-6 rounded border border-[#24445C]">
-            <h3 className="font-bold text-lg text-[#24445C] mb-3 border-b border-[#24445C] pb-2 text-center">
+            <h3 className="font-bold text-sm text-[#24445C] mb-3 border-b border-[#24445C] pb-2 text-center">
               DATE : {new Date(data.date).toLocaleDateString('fr-FR')}
             </h3>
-            <div className="text-lg text-black space-y-1 text-center">
+            <div className="text-sm text-black space-y-1 text-center">
               <p><strong> {type === 'invoice' ? 'FACTURE' : 'DEVIS'} N° :</strong> {data.number}</p>
             </div>
           </div>
@@ -113,10 +113,10 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
       <div className="p-8">
         <div className="flex justify-between">
           <div className="w-80 bg-gray-50 rounded border border-[#24445C] p-4">
-            <div className="text-lg font-bold pt-3 text-center text-[#24445C]">
+            <div className="text-sm font-bold pt-3 text-center text-[#24445C]">
               <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
-            <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#24445C] text-[BLACK]">
+            <div className="flex justify-between text-sm font-bold border-t pt-2 border-[#24445C] text-[BLACK]">
               <p>• {data.totalInWords}</p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
               <span>Total HT :</span>
               <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
             </div>
-           <div className="text-lg mb-2">
+           <div className="text-sm mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
@@ -161,7 +161,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
     ));
   })()}
 </div>
-            <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#24445C] text-[BLACK]">
+            <div className="flex justify-between text-sm font-bold border-t pt-2 border-[#24445C] text-[BLACK]">
               <span>TOTAL TTC :</span>
               <span>{data.totalTTC.toFixed(2)} MAD</span>
             </div>
