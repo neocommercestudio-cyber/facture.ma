@@ -55,7 +55,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
             <h3 className="font-bold text-[#0a1f44] mb-3 border-b border-[#0a1f44] pb-2 text-center text-sm">
               CLIENT : {data.client.name} {data.client.address}
             </h3>
-            <div className="text-base text-gray-700 space-y-1 text-center">
+            <div className="text-sm text-gray-700 space-y-1 text-center">
               <p>
                 <strong>ICE:</strong> {data.client.ice}
               </p>
