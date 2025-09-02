@@ -40,10 +40,10 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
     style={{ height: "150px", width: "150px" }}
   />
 )}
-        <h1 className="text-5xl font-extrabold text-[#0a1f44]">
+        <h1 className="text-4xl font-extrabold text-[#0a1f44]">
           {user?.company.name}
         </h1>
-        <h2 className="text-4xl font-semibold mt-4 uppercase tracking-wide text-[#0a1f44]">
+        <h2 className="text-3xl font-semibold mt-4 uppercase tracking-wide text-[#0a1f44]">
           {type === 'invoice' ? 'FACTURE' : 'DEVIS'}
         </h2>
       </div>
