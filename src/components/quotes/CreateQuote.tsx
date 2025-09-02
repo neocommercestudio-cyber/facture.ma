@@ -77,7 +77,8 @@ export default function CreateQuote() {
             ...item,
             description: productName,
             unitPrice: selectedProduct.salePrice,
-            total: item.quantity * selectedProduct.salePrice
+            total: item.quantity * selectedProduct.salePrice,
+            unit: selectedProduct.unit || 'unité'
           };
           return updatedItem;
         }
@@ -91,7 +92,8 @@ export default function CreateQuote() {
             description: '',
             unitPrice: 0,
             vatRate: 0,
-            total: 0
+            total: 0,
+            unit: undefined
           };
         }
         return item;
@@ -106,7 +108,8 @@ export default function CreateQuote() {
       quantity: 1,
       unitPrice: 0,
       vatRate: 0,
-      total: 0
+      total: 0,
+      unit: undefined
     };
     setItems([...items, newItem]);
   };

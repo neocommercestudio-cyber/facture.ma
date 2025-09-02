@@ -64,6 +64,7 @@ export interface QuoteItem {
   unitPrice: number;
   vatRate: number;
   total: number;
+  unit?: string;
 }
 
 export interface Invoice {
@@ -94,6 +95,7 @@ export interface InvoiceItem {
   unitPrice: number;
   vatRate: number;
   total: number;
+  unit?: string;
 }
 
 interface DataContextType {

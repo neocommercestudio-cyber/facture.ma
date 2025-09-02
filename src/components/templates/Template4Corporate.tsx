@@ -93,7 +93,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
             {data.items.map((item, index) => (
               <tr key={index} className="border-t border-[#24445C]">
                 <td className="px-4 py-2 text-center">{item.description}</td>
-                <td className="px-4 py-2 text-center">{item.quantity.toFixed(3)} {getProductUnit(item.description)}</td>
+                <td className="px-4 py-2 text-center">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
                 <td className="px-4 py-2 text-center">{item.unitPrice.toFixed(2)} MAD</td>
                 <td className="px-4 py-2 text-center font-semibold">
                   {item.total.toFixed(2)} MAD

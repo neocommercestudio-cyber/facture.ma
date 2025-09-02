@@ -10,13 +10,6 @@ interface TemplateProps {
 export default function Template1Classic({ data, type }: TemplateProps) {
   const { user } = useAuth();
   const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
-  
-  // Fonction pour récupérer l'unité d'un produit
-  const getProductUnit = (productName: string) => {
-    // Cette fonction sera utilisée dans le contexte où les produits sont disponibles
-    // Pour l'instant, on retourne une unité par défaut
-    return 'unité';
-  };
 
   
   return (
@@ -83,7 +76,7 @@ export default function Template1Classic({ data, type }: TemplateProps) {
               {data.items.map((item, index) => (
                 <tr key={index} className="border-t border-gray-200">
                   <td className="border-r border-gray-300 px-4 text-center py-3">{item.description}</td>
-                  <td className="border-r border-gray-300 px-4 py-3 text-center">{item.quantity.toFixed(3)}</td>
+                  <td className="border-r border-gray-300 px-4 py-3 text-center">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
                   <td className="border-r border-gray-300 px-4 py-3 text-center">{item.unitPrice.toFixed(2)} MAD</td>
                   <td className="px-4 py-3 text-center font-medium">{item.total.toFixed(2)} MAD</td>
                 </tr>

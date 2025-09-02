@@ -71,7 +71,8 @@ export default function EditQuote({ quote, onSave, onCancel }: EditQuoteProps) {
       quantity: 1,
       unitPrice: 0,
       vatRate: 0,
-      total: 0
+      total: 0,
+      unit: undefined
     };
     setItems([...items, newItem]);
   };

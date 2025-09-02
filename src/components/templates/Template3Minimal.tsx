@@ -10,12 +10,6 @@ interface TemplateProps {
 export default function Template3Minimal({ data, type }: TemplateProps) {
   const { user } = useAuth();
 
-  // Fonction pour récupérer l'unité d'un produit
-  const getProductUnit = (productName: string) => {
-    // Cette fonction sera utilisée dans le contexte où les produits sont disponibles
-    // Pour l'instant, on retourne une unité par défaut
-    return 'unité';
-  };
 
   return (
     <div
@@ -98,7 +92,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
                 className="border-t border-[#0a1f44] hover:bg-gray-50"
               >
                 <td className="px-4 py-2 text-center">{item.description}</td>
-                <td className="px-4 py-2 text-center">{item.quantity.toFixed(3)} {getProductUnit(item.description)}</td>
+                <td className="px-4 py-2 text-center">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
                 <td className="px-4 py-2 text-center">
                   {item.unitPrice.toFixed(2)} MAD
                 </td>

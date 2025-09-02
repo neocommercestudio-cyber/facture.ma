@@ -73,7 +73,8 @@ export default function EditInvoice({ invoice, onSave, onCancel }: EditInvoicePr
       quantity: 1,
       unitPrice: 0,
       vatRate: 0,
-      total: 0
+      total: 0,
+      unit: undefined
     };
     setItems([...items, newItem]);
   };

@@ -11,12 +11,6 @@ export default function Template2Modern({ data, type }: TemplateProps) {
   const { user } = useAuth();
   const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
 
-  // Fonction pour récupérer l'unité d'un produit
-  const getProductUnit = (productName: string) => {
-    // Cette fonction sera utilisée dans le contexte où les produits sont disponibles
-    // Pour l'instant, on retourne une unité par défaut
-    return 'unité';
-  };
 
   return (
     <div className="bg-white max-w-4xl mx-auto border border-black" style={{ fontFamily: 'Arial, sans-serif' }}>
@@ -79,7 +73,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
               {data.items.map((item, index) => (
                 <tr key={index} className="border-t border-black">
                   <td className="border-r border-black px-4 py-3  text-center">{item.description}</td>
-                  <td className="border-r border-black px-4 py-3 text-center">{getProductUnit(item.description)}</td>
+                  <td className="border-r border-black px-4 py-3 text-center">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
                   <td className="border-r border-black px-4 py-3 text-center">{item.unitPrice.toFixed(2)} MAD</td>
                   <td className="px-4 py-3 text-center font-medium">{item.total.toFixed(2)} MAD</td>
                 </tr>
