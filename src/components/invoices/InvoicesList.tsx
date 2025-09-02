@@ -5,6 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useLicense } from '../../contexts/LicenseContext';
 import InvoiceViewer from './InvoiceViewer';
 import EditInvoice from './EditInvoice';
+import InvoiceStatusModal from './InvoiceStatusModal';
 import ProTemplateModal from '../license/ProTemplateModal';
 import { Plus, Search, Filter, Download, Eye, Edit, Trash2, Crown, CreditCard } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
