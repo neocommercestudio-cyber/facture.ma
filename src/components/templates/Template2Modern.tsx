@@ -63,7 +63,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
             <thead className="bg-black text-white">
               <tr>
                 <th className="border-r border-white px-4 py-3 text-center font-bold">DÉSIGNATION</th>
-                <th className="border-r border-white px-4 py-3 text-center font-bold">QUANTITÉ</th>
+                <td className="border-r border-black px-4 py-3 text-center">{item.quantity.toFixed(3)} {getProductUnit(item.description)}</td>
                 <th className="border-r border-white px-4 py-3 text-center font-bold">P.U. HT</th>
                 <th className="px-4 py-3 text-center font-bold">TOTAL HT</th>
               </tr>

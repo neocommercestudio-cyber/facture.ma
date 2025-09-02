@@ -11,6 +11,12 @@ export default function Template1Classic({ data, type }: TemplateProps) {
   const { user } = useAuth();
   const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
   
+  // Fonction pour récupérer l'unité d'un produit
+  const getProductUnit = (productName: string) => {
+    // Cette fonction sera utilisée dans le contexte où les produits sont disponibles
+    // Pour l'instant, on retourne une unité par défaut
+    return 'unité';
+  };
 
   
   return (

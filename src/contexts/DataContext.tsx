@@ -32,6 +32,7 @@ export interface Product {
   category: string;
   purchasePrice: number;
   salePrice: number;
+  unit: string;
   stock: number;
   minStock: number;
   status: 'active' | 'inactive';

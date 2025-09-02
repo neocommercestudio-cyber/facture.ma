@@ -365,7 +365,7 @@ export default function CreateQuote() {
                         <option value="">Sélectionner un produit...</option>
                         {products.map(product => (
                           <option key={product.id} value={product.name}>
-                            {product.name} - {product.salePrice.toFixed(2)} MAD
+                            {product.name} - {product.salePrice.toFixed(2)} MAD ({product.unit || 'unité'})
                           </option>
                         ))}
                       </select>
@@ -376,7 +376,7 @@ export default function CreateQuote() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Quantité
+                        Quantité ({getProductBySku(item.description)?.unit || 'unité'})
                       </label>
                       <input
                         type="number"
@@ -384,6 +384,7 @@ export default function CreateQuote() {
                         value={item.quantity}
                         onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder={`Ex: 25 ${getProductBySku(item.description)?.unit || 'unité'}`}
                       />
                     </div>
                     <div>

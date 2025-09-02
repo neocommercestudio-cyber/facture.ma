@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import AddProductModal from './AddProductModal';
+import EditProductModal from './EditProductModal';
 import { Plus, Search, Edit, Trash2, AlertTriangle, Package } from 'lucide-react';
 
 export default function ProductsList() {
@@ -9,6 +10,7 @@ export default function ProductsList() {
   const { products, deleteProduct } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<string | null>(null);
 
   const getStatusBadge = (product: typeof products[0]) => {
     if (product.stock <= product.minStock) {
@@ -37,6 +39,9 @@ export default function ProductsList() {
     }
   };
 
+  const handleEditProduct = (id: string) => {
+    setEditingProduct(id);
+  };
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -116,7 +121,7 @@ export default function ProductsList() {
                 </th>
               
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stock
+                  Stock / Unité
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Statut
@@ -148,13 +153,13 @@ export default function ProductsList() {
                       <span className={`text-sm font-medium ${
                         product.stock <= product.minStock ? 'text-red-600' : 'text-gray-900'
                       }`}>
-                        {product.stock.toFixed(3)}
+                        {product.stock.toFixed(3)} {product.unit || 'unité'}
                       </span>
                       {product.stock <= product.minStock && (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
                       )}
                     </div>
-                    <div className="text-xs text-gray-500">Min: {product.minStock.toFixed(3)}</div>
+                    <div className="text-xs text-gray-500">Min: {product.minStock.toFixed(3)} {product.unit || 'unité'}</div>
                     {product.stock === 0 && (
                       <div className="text-xs text-red-600 font-medium">Rupture de stock</div>
                     )}
@@ -164,12 +169,17 @@ export default function ProductsList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center space-x-3">
-                      <button className="text-amber-600 hover:text-amber-700 transition-colors">
+                      <button 
+                        onClick={() => handleEditProduct(product.id)}
+                        className="text-amber-600 hover:text-amber-700 transition-colors"
+                        title="Modifier"
+                      >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleDeleteProduct(product.id)}
                         className="text-red-600 hover:text-red-700 transition-colors"
+                        title="Supprimer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -192,6 +202,14 @@ export default function ProductsList() {
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
       />
+
+      {editingProduct && (
+        <EditProductModal
+          isOpen={!!editingProduct}
+          onClose={() => setEditingProduct(null)}
+          product={products.find(p => p.id === editingProduct)!}
+        />
+      )}
     </div>
   );
 }

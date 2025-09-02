@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
-import { useData } from '../../contexts/DataContext';
-import { useLicense } from '../../contexts/LicenseContext';
+import { useData, Product } from '../../contexts/DataContext';
 import Modal from '../common/Modal';
 
-interface AddProductModalProps {
+interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
+  product: Product;
 }
 
-export default function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
-  const { addProduct } = useData();
-  const { checkLimit } = useLicense();
+export default function EditProductModal({ isOpen, onClose, product }: EditProductModalProps) {
+  const { updateProduct } = useData();
   const [formData, setFormData] = useState({
-    name: '',
-    category: '',
-    purchasePrice: 0,
-    salePrice: 0,
-    vatRate: 0,
-    unit: 'Kg',
+    name: product.name,
+    category: product.category,
+    purchasePrice: product.purchasePrice,
+    salePrice: product.salePrice,
+    unit: product.unit || 'Kg',
     customUnit: '',
-    stock: 0,
-    minStock: 5,
-    status: 'active' as const
+    stock: product.stock,
+    minStock: product.minStock,
+    status: product.status
   });
 
   const categories = [
@@ -41,14 +39,9 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
     { value: 'Tonne', label: 'Tonne' },
     { value: 'Autre', label: 'Autre' }
   ];
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!checkLimit('products')) {
-      alert('🚨 Vous avez atteint la limite de produits de la version gratuite. Passez à la version Pro pour continuer.');
-      return;
-    }
-    
     if (!formData.name) {
       alert('Le nom est obligatoire');
       return;
@@ -56,21 +49,9 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
     
     const finalUnit = formData.unit === 'Autre' ? formData.customUnit : formData.unit;
     
-    addProduct({
+    await updateProduct(product.id, {
       ...formData,
       unit: finalUnit
-    });
-    setFormData({
-      name: '',
-      category: '',
-      purchasePrice: 0,
-      salePrice: 0,
-      vatRate: 0,
-      unit: 'Kg',
-      customUnit: '',
-      stock: 0,
-      minStock: 5,
-      status: 'active'
     });
     onClose();
   };
@@ -84,7 +65,7 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Nouveau Produit" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Modifier Produit" size="lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -208,6 +189,21 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Statut
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            >
+              <option value="active">Actif</option>
+              <option value="inactive">Inactif</option>
+            </select>
+          </div>
         </div>
 
         <div className="flex justify-end space-x-3 pt-6">
@@ -222,7 +218,7 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
             type="submit"
             className="px-4 py-2 bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200"
           >
-            Ajouter Produit
+            Modifier Produit
           </button>
         </div>
       </form>
