@@ -13,7 +13,8 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  FileCheck
+  FileCheck,
+  TrendingUp
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -33,6 +34,7 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
     { icon: FileCheck, label: 'Devis', path: '/quotes' },
     { icon: Users, label: t('clients'), path: '/clients' },
     { icon: Package, label: t('products'), path: '/products' },
+    ...(isProActive ? [{ icon: TrendingUp, label: 'Gestion de Stock', path: '/stock-management' }] : []),
     { icon: BarChart3, label: t('reports'), path: '/reports' },
     { icon: Settings, label: t('settings'), path: '/settings' },
   ];

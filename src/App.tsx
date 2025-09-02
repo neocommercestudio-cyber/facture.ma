@@ -24,6 +24,7 @@ import ProUpgradeSuccess from './components/license/ProUpgradeSuccess';
 import { useLicense } from './contexts/LicenseContext';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
+import StockManagement from './components/stock/StockManagement';
 
 function AppContent() {
   const { user, isAuthenticated, showExpiryAlert, setShowExpiryAlert, expiredDate } = useAuth();
@@ -65,6 +66,7 @@ function AppContent() {
             <Route path="/quotes/create" element={<CreateQuote />} />
             <Route path="/clients" element={<ClientsList />} />
             <Route path="/products" element={<ProductsList />} />
+            <Route path="/stock-management" element={<StockManagement />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
