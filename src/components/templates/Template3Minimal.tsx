@@ -63,10 +63,10 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
           </div>
 
           <div className="bg-white p-6 rounded border border-[#0a1f44] shadow-sm">
-            <h3 className="font-bold text-base text-[#0a1f44] mb-3 border-b border-[#0a1f44] pb-2 text-center">
+            <h3 className="font-bold text-sm text-[#0a1f44] mb-3 border-b border-[#0a1f44] pb-2 text-center">
               DATE : {new Date(data.date).toLocaleDateString('fr-FR')}
             </h3>
-            <div className="text-base text-gray-700 space-y-1 text-center">
+            <div className="text-sm text-gray-700 space-y-1 text-center">
               <p>
                 <strong>FACTURE N° :</strong> {data.number}
               </p>
