@@ -139,7 +139,7 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
                       <Icon className="w-5 h-5 flex-shrink-0" />
                       {open && (
                         <div className="flex items-center space-x-2">
-                          <span className="font-medium text-xs">{item.label}</span>
+                          <span className="font-medium text-s">{item.label}</span>
                           <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">
                             🔒 PRO
                           </span>
