@@ -79,7 +79,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
               {data.items.map((item, index) => (
                 <tr key={index} className="border-t border-black">
                   <td className="border-r border-black px-4 py-3  text-center">{item.description}</td>
-                  <td className="border-r border-black px-4 py-3 text-center">{item.quantity.toFixed(3)}</td>
+                  <td className="border-r border-black px-4 py-3 text-center">{getProductUnit(item.description)}</td>
                   <td className="border-r border-black px-4 py-3 text-center">{item.unitPrice.toFixed(2)} MAD</td>
                   <td className="px-4 py-3 text-center font-medium">{item.total.toFixed(2)} MAD</td>
                 </tr>
