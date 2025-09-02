@@ -37,7 +37,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
     src={user.company.logo}
     alt="Logo"
     className="mx-auto"
-    style={{ height: "260px", width: "260px" }}
+    style={{ height: "200px", width: "200px" }}
   />
 )}
         <h1 className="text-5xl font-extrabold text-[#0a1f44]">
