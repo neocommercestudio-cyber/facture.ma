@@ -62,19 +62,19 @@ export default function Template5Premium({ data, type }: TemplateProps) {
       <div className="p-8 border-b border-black">
         <div className="grid grid-cols-2 gap-8">
           <div className="bg-gray-50 p-6 rounded border border-black">
-            <h3 className="font-bold text-lg text-black mb-3 border-b border-black pb-2 text-center">
+            <h3 className="font-boldtext-sm text-black mb-3 border-b border-black pb-2 text-center">
               CLIENT : {data.client.name} {data.client.address}
             </h3>
-            <div className="text-lg text-black space-y-1 text-center">
+            <div className=" text-black space-y-1 text-center">
               <p><strong>ICE:</strong> {data.client.ice}</p>
             </div>
           </div>
 
           <div className="bg-gray-50 p-6 rounded border border-black">
-            <h3 className="font-bold text-lg text-black mb-3 border-b border-black pb-2 text-center">
+            <h3 className="font-boldtext-sm text-black mb-3 border-b border-black pb-2 text-center">
               DATE : {new Date(data.date).toLocaleDateString('fr-FR')}
             </h3>
-            <div className="text-lg text-black space-y-1 text-center">
+            <div className="text-sm text-black space-y-1 text-center">
               <p><strong> {type === 'invoice' ? 'FACTURE' : 'DEVIS'} N° :</strong> {data.number}</p>
             </div>
           </div>
@@ -115,10 +115,10 @@ export default function Template5Premium({ data, type }: TemplateProps) {
         <div className="flex justify-between">
           {/* Bloc gauche */}
         <div className="w-80 bg-gray-50 rounded border border-[#0a1f44] p-4">
-            <div className="text-lg font-bold border-black pt-3 text-center">
+            <div className="text-sm font-bold border-black pt-3 text-center">
               <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
-          <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#03224C] text-[#03224C]">
+          <div className="flex justify-betweentext-sm font-bold border-t pt-2 border-[#03224C] text-[#03224C]">
               <p > • {data.totalInWords}</p>
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
               <span>Total HT :</span>
               <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
             </div>
-          <div className="text-lg mb-2">
+          <div className="text-sm mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
@@ -164,7 +164,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
     ));
   })()}
 </div>
-          <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#03224C] text-[#03224C]">
+          <div className="flex justify-between text-sm font-bold border-t pt-2 border-[#03224C] text-[#03224C]">
               <span>TOTAL TTC :</span>
               <span>{data.totalTTC.toFixed(2)} MAD</span>
             </div>
