@@ -125,7 +125,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
                 {data.subtotal.toFixed(2)} MAD
               </span>
             </div>
-            <div className="text-base mb-2">
+            <div className="text-sm mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
