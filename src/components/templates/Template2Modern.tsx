@@ -103,7 +103,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
               <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
             </div>
             
-<div className="text-lg mb-2">
+<div className="text-sm mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
