@@ -379,10 +379,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         createdAt: new Date().toISOString()
       });
 
-      // Mettre à jour le stock
-      for (const item of invoiceData.items) {
-        await updateProductStock(item.description, item.quantity);
-      }
+      // Note: Le stock initial ne change jamais
+      // Les quantités vendues sont calculées dynamiquement depuis les factures
     } catch (error) {
       console.error('Erreur lors de l\'ajout de la facture:', error);
     }
