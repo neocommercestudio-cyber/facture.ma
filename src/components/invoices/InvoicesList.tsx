@@ -538,7 +538,10 @@ export default function InvoicesList() {
             return (
               <div key={year} className="space-y-4">
                 {/* Bloc statistiques de l'année */}
-                <div className="bg-gradient-to-r from-teal-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <div 
+                  className="bg-gradient-to-r from-teal-600 to-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:from-teal-700 hover:to-blue-700 transition-all duration-200"
+                  onClick={() => toggleYearExpansion(year)}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
@@ -549,7 +552,8 @@ export default function InvoicesList() {
                         <p className="text-sm opacity-90">Résumé de l'année {year}</p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="flex items-center space-x-6">
+                      <div className="text-right">
                       <div className="grid grid-cols-2 gap-6">
                         <div className="text-center">
                           <p className="text-3xl font-bold">{stats.count}</p>
@@ -560,12 +564,22 @@ export default function InvoicesList() {
                           <p className="text-sm opacity-90">MAD Total TTC</p>
                         </div>
                       </div>
+                      </div>
+                      <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        {expandedYears[year] ? (
+                          <ChevronDown className="w-5 h-5" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5" />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Tableau des factures de l'année */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                {/* Tableau des factures de l'année - Collapsible */}
+                <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 ${
+                  expandedYears[year] ? 'max-h-none opacity-100' : 'max-h-0 opacity-0'
+                }`}>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
