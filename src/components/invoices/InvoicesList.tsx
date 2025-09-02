@@ -6,7 +6,7 @@ import { useLicense } from '../../contexts/LicenseContext';
 import InvoiceViewer from './InvoiceViewer';
 import EditInvoice from './EditInvoice';
 import ProTemplateModal from '../license/ProTemplateModal';
-import { Plus, Search, Filter, Download, Eye, Edit, Trash2, Crown } from 'lucide-react';
+import { Plus, Search, Filter, Download, Eye, Edit, Trash2, Crown, CreditCard } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 export default function InvoicesList() {
@@ -477,6 +477,9 @@ export default function InvoicesList() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Montant TTC
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
                
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -501,9 +504,32 @@ export default function InvoicesList() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {invoice.totalTTC.toLocaleString()} MAD
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      {getStatusBadge(invoice.status)}
+                      {invoice.status === 'paid' && invoice.paymentMethod && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {getPaymentMethodLabel(invoice.paymentMethod)}
+                        </div>
+                      )}
+                      {invoice.status === 'collected' && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {invoice.collectionDate && new Date(invoice.collectionDate).toLocaleDateString('fr-FR')}
+                          {invoice.collectionType && ` (${invoice.collectionType})`}
+                        </div>
+                      )}
+                    </div>
+                  </td>
                  
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center space-x-3">
+                      <button 
+                        onClick={() => setStatusModalInvoice(invoice.id)}
+                        className="text-purple-600 hover:text-purple-700 transition-colors" 
+                        title="Statut"
+                      >
+                        <CreditCard className="w-4 h-4" />
+                      </button>
                       <button 
                         onClick={() => handleViewInvoice(invoice.id)}
                         className="text-blue-600 hover:text-blue-700 transition-colors" 
@@ -537,6 +563,12 @@ export default function InvoicesList() {
         {filteredInvoices.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">Aucune facture trouvée</p>
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg max-w-md mx-auto">
+              <p className="text-sm text-blue-800">
+                💡 <strong>Astuce :</strong> Le statut par défaut d'une facture est "Non payé". 
+                Vous pouvez le modifier en cliquant sur le bouton Statut dans les actions.
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -597,6 +629,28 @@ export default function InvoicesList() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Status Modal */}
+      {statusModalInvoice && (
+        <InvoiceStatusModal
+          isOpen={!!statusModalInvoice}
+          onClose={() => setStatusModalInvoice(null)}
+          invoice={invoices.find(inv => inv.id === statusModalInvoice)!}
+          onUpdateStatus={(status, paymentMethod, collectionDate, collectionType) => 
+            handleUpdateStatus(statusModalInvoice, status, paymentMethod, collectionDate, collectionType)
+          }
+        />
+      )}
+
+      {/* Info message pour les nouvelles factures */}
+      {invoices.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-800">
+            💡 <strong>Information :</strong> Le statut par défaut d'une facture est "Non payé". 
+            Vous pouvez le modifier en cliquant sur l'icône 💳 dans la colonne Actions.
+          </p>
         </div>
       )}
     </div>

@@ -9,8 +9,12 @@ export default function StatsCards() {
 
   // Chiffre d'affaires total des factures créées cette année
   const currentYear = new Date().getFullYear();
-  const totalRevenue = invoices
-    .filter(invoice => new Date(invoice.createdAt).getFullYear() === currentYear)
+  const paidInvoices = invoices.filter(invoice => 
+    new Date(invoice.createdAt).getFullYear() === currentYear && 
+    (invoice.status === 'paid' || invoice.status === 'collected')
+  );
+  
+  const totalRevenue = paidInvoices
     .reduce((sum, invoice) => sum + invoice.totalTTC, 0);
 
   // Nombre total de factures créées cette année
@@ -18,20 +22,26 @@ export default function StatsCards() {
     new Date(invoice.createdAt).getFullYear() === currentYear
   ).length;
 
+  // Factures en attente de paiement
+  const unpaidInvoices = invoices.filter(invoice => 
+    new Date(invoice.createdAt).getFullYear() === currentYear && 
+    invoice.status === 'unpaid'
+  ).length;
+
   const stats = [
     {
-      title: 'Chiffre d\'Affaires ' + currentYear,
+      title: 'CA Encaissé ' + currentYear,
       value: `${totalRevenue.toLocaleString()} MAD`,
-      subtitle: 'Factures créées cette année',
+      subtitle: 'Factures payées/encaissées',
       icon: DollarSign,
       bgColor: 'bg-gradient-to-br from-emerald-500 to-teal-600',
     },
     {
-      title: 'Factures Créées ' + currentYear,
-      value: totalInvoicesThisYear.toString(),
-      subtitle: 'Total factures cette année',
+      title: 'Factures Non Payées',
+      value: unpaidInvoices.toString(),
+      subtitle: 'En attente de paiement',
       icon: FileText,
-      bgColor: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+      bgColor: 'bg-gradient-to-br from-red-500 to-pink-600',
     },
     {
       title: 'Total Clients',

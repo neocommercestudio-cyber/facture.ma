@@ -172,7 +172,7 @@ export default function CreateInvoice() {
         subtotal,
         totalVat,
         totalTTC,
-        status: 'draft'
+        status: 'unpaid'
       });
       
       setShowSuccessModal(true);

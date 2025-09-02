@@ -16,26 +16,30 @@ export default function RecentInvoices() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'paid':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-            {t('paid')}
-          </span>
-        );
-      case 'pending':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            {t('pending')}
-          </span>
-        );
-      case 'overdue':
+      case 'unpaid':
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            {t('overdue')}
+            Non payé
+          </span>
+        );
+      case 'paid':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Payé
+          </span>
+        );
+      case 'collected':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            Encaissé
           </span>
         );
       default:
-        return null;
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            Brouillon
+          </span>
+        );
     }
   };
 

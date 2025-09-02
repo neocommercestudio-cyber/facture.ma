@@ -77,7 +77,10 @@ export interface Invoice {
   totalVat: number;
   totalTTC: number;
   totalInWords: string;
-  status: 'draft' | 'sent' | 'paid' | 'pending' | 'overdue';
+  status: 'draft' | 'sent' | 'unpaid' | 'paid' | 'collected';
+  paymentMethod?: 'virement' | 'espece' | 'cheque' | 'effet';
+  collectionDate?: string;
+  collectionType?: 'cheque' | 'effet';
   createdAt: string;
   quoteId?: string;
   entrepriseId: string;
@@ -368,6 +371,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         ...invoiceData,
         number: invoiceNumber,
         totalInWords,
+        status: 'unpaid', // Statut par défaut
         entrepriseId: user.id,
         createdAt: new Date().toISOString()
       });
@@ -489,6 +493,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     getProductById,
     getInvoiceById,
     getQuoteById,
+    updateInvoiceStatus: updateInvoice,
     isLoading,
   };
 
