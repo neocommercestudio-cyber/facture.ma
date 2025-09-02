@@ -90,8 +90,8 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
                 key={index}
                 className="border-t border-[#0a1f44] hover:bg-gray-50"
               >
-                <td className="px-4 py-2 text-center">{item.description}</td>
-                <td className="px-4 py-2 text-center">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
+                <td className="px-4 py-2 text-center text-sm">{item.description}</td>
+                <td className="px-4 py-2 text-center text-sm">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
                 <td className="px-4 py-2 text-center">
                   {item.unitPrice.toFixed(2)} MAD
                 </td>
