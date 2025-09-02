@@ -98,7 +98,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
         {/* TOTALS */}
         <div className="p-8 flex justify-between">
           {/* Bloc gauche */}
-           <div className="w-80 bg-gray-50 rounded border border-[#0a1f44] p-4">
+           <div className="w-80 bg-gray-50 rounded border border-[#0a1f44] p-4 pb-4">
           <div className="text-sm font-bold pt-3 text-center  pb-4">
             <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             
