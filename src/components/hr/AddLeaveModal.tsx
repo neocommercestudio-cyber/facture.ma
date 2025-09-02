@@ -16,7 +16,8 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
     type: 'annual' as const,
     status: 'pending' as const,
     reason: '',
-    includeSaturdays: false
+    includeSaturdays: false,
+    manualHolidays: 0
   });
 
   const leaveTypes = [
@@ -37,23 +38,8 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
     let workingDays = 0;
     const currentDate = new Date(start);
     
-    // Jours fériés fixes au Maroc (approximatifs)
-    const publicHolidays = [
-      '01-01', // Nouvel An
-      '01-11', // Manifeste de l'Indépendance
-      '05-01', // Fête du Travail
-      '07-30', // Fête du Trône
-      '08-14', // Journée Oued Ed-Dahab
-      '08-20', // Révolution du Roi et du Peuple
-      '08-21', // Fête de la Jeunesse
-      '11-06', // Marche Verte
-      '11-18'  // Fête de l'Indépendance
-    ];
-    
     while (currentDate <= end) {
       const dayOfWeek = currentDate.getDay(); // 0 = Dimanche, 6 = Samedi
-      const monthDay = String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
-                      String(currentDate.getDate()).padStart(2, '0');
       
       // Exclure les dimanches (toujours)
       if (dayOfWeek === 0) {
@@ -67,17 +53,12 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
         continue;
       }
       
-      // Exclure les jours fériés
-      if (publicHolidays.includes(monthDay)) {
-        currentDate.setDate(currentDate.getDate() + 1);
-        continue;
-      }
-      
       workingDays++;
       currentDate.setDate(currentDate.getDate() + 1);
     }
     
-    return workingDays;
+    // Soustraire les jours fériés saisis manuellement
+    return Math.max(0, workingDays - formData.manualHolidays);
   };
 
   const workingDays = calculateWorkingDays();
@@ -121,7 +102,8 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
       type: 'annual',
       status: 'pending',
       reason: '',
-      includeSaturdays: false
+      includeSaturdays: false,
+      manualHolidays: 0
     });
     onClose();
   };
@@ -199,7 +181,26 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
             <span className="text-sm text-gray-700">Inclure les samedis comme jours travaillés</span>
           </label>
           <p className="text-xs text-gray-500 mt-1">
-            Par défaut, les dimanches et jours fériés sont exclus du calcul
+            Par défaut, seuls les dimanches sont exclus du calcul
+          </p>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Nombre de jours fériés dans cette période
+          </label>
+          <input
+            type="number"
+            name="manualHolidays"
+            value={formData.manualHolidays}
+            onChange={handleChange}
+            min="0"
+            max="10"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="0"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Saisissez manuellement le nombre de jours fériés qui tombent dans cette période de congé
           </p>
         </div>
         
@@ -261,7 +262,10 @@ export default function AddLeaveModal({ isOpen, onClose }: AddLeaveModalProps) {
               <p>• Période totale: {totalCalendarDays} jour{totalCalendarDays > 1 ? 's' : ''} calendaires</p>
               <p>• Dimanches exclus automatiquement</p>
               <p>• Samedis {formData.includeSaturdays ? 'inclus' : 'exclus'}</p>
-              <p>• Jours fériés marocains exclus</p>
+              <p>• Jours fériés saisis manuellement: {formData.manualHolidays}</p>
+              {formData.manualHolidays > 0 && (
+                <p className="text-purple-600 font-medium">→ Jours fériés déduits du calcul</p>
+              )}
             </div>
           </div>
         )}
