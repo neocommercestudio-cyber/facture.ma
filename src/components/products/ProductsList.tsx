@@ -7,10 +7,38 @@ import { Plus, Search, Edit, Trash2, AlertTriangle, Package } from 'lucide-react
 
 export default function ProductsList() {
   const { t } = useLanguage();
-  const { products, deleteProduct } = useData();
+  const { products, deleteProduct, invoices } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
+
+  const getProductStats = (productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return { remainingStock: 0, ordersCount: 0, totalOrdered: 0 };
+
+    // Calculate total ordered quantity from all invoices
+    let totalOrdered = 0;
+    let ordersCount = 0;
+    const ordersSet = new Set();
+
+    invoices.forEach(invoice => {
+      let hasProduct = false;
+      invoice.items.forEach(item => {
+        if (item.description === product.name) {
+          totalOrdered += item.quantity;
+          hasProduct = true;
+        }
+      });
+      if (hasProduct) {
+        ordersSet.add(invoice.id);
+      }
+    });
+
+    ordersCount = ordersSet.size;
+    const remainingStock = product.stock - totalOrdered;
+
+    return { remainingStock, ordersCount, totalOrdered };
+  };
 
   const getStatusBadge = (product: typeof products[0]) => {
     const stats = getProductStats(product.id);
