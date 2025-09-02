@@ -36,37 +36,20 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
   // Vérifier si l'activation est en cours
   const isActivationPending = localStorage.getItem('proActivationPending') === 'true';
 
-  const handleProFeatureClick = (e: React.MouseEvent, path: string) => {
-    if (!isProActive) {
-      e.preventDefault();
-      onUpgrade();
-    }
-  };
   const menuItems = [
     { icon: LayoutDashboard, label: t('dashboard'), path: '/dashboard' },
     { icon: FileText, label: t('invoices'), path: '/invoices' },
     { icon: FileCheck, label: 'Devis', path: '/quotes' },
     { icon: Users, label: t('clients'), path: '/clients' },
     { icon: Package, label: t('products'), path: '/products' },
-    { 
+    ...(isProActive ? [{ 
       icon: TrendingUp, 
       label: 'Gestion de Stock', 
       path: '/stock-management',
       isPro: true 
-    },
-    { 
-      icon: UserCheck, 
-      label: 'Gestion Humaine', 
-      path: '/hr-management',
-      isPro: true 
-    },
-    { 
-      icon: BarChart3, 
-      label: t('reports'), 
-      path: '/reports',
-      isPro: true 
-    },
-    
+    }] : []),
+    { icon: UserCheck, label: 'Gestion Humaine', path: '/hr-management' },
+    { icon: BarChart3, label: t('reports'), path: '/reports' },
     { icon: Settings, label: t('settings'), path: '/settings' },
   ];
 
@@ -103,50 +86,30 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isProFeature = item.isPro;
-              const canAccess = !isProFeature || isProActive;
-              
               return (
                 <li key={item.path}>
-                  {canAccess ? (
-                    <NavLink
-                      to={item.path}
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                          isActive
-                            ? 'bg-gradient-to-r from-teal-500 to-blue-500 text-white shadow-lg'
-                            : 'text-gray-700 hover:bg-gray-100'
-                        }`
-                      }
-                    >
-                      <Icon className="w-5 h-5 flex-shrink-0" />
-                      {open && (
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">{item.label}</span>
-                          {item.isPro && (
-                            <span className="text-xs bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full font-bold">
-                              PRO
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </NavLink>
-                  ) : (
-                    <button
-                      onClick={(e) => handleProFeatureClick(e, item.path)}
-                      className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group text-gray-500 hover:bg-red-50 hover:text-red-600 cursor-pointer"
-                    >
-                      <Icon className="w-5 h-5 flex-shrink-0" />
-                      {open && (
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">{item.label}</span>
-                          <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">
-                            🔒 PRO
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                        isActive
+                          ? 'bg-gradient-to-r from-teal-500 to-blue-500 text-white shadow-lg'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`
+                    }
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {open && (
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium">{item.label}</span>
+                        {item.isPro && (
+                          <span className="text-xs bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full font-bold">
+                            PRO
                           </span>
-                        </div>
-                      )}
-                    </button>
-                  )}
+                        )}
+                      </div>
+                    )}
+                  </NavLink>
                 </li>
               );
             })}
