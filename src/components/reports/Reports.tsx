@@ -191,6 +191,42 @@ export default function Reports() {
         })}
       </div>
 
+   {/* Moyenne mensuelle */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Résumé Financier</h3>
+            <p className="text-sm text-gray-600">Performance globale</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+            <p className="text-2xl font-bold text-green-600">{totalRevenue.toLocaleString()}</p>
+            <p className="text-sm text-green-700">MAD Encaissés</p>
+            <p className="text-xs text-gray-500">{paidInvoices.length} factures payées</p>
+          </div>
+          
+          <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+            <p className="text-2xl font-bold text-red-600">{unpaidRevenue.toLocaleString()}</p>
+            <p className="text-sm text-red-700">MAD En Attente</p>
+            <p className="text-xs text-gray-500">{unpaidInvoices.length} factures non payées</p>
+          </div>
+          
+          <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-2xl font-bold text-blue-600">
+              {monthlyData.length > 0 ? Math.round(monthlyData.reduce((acc, d) => acc + d.sales, 0) / monthlyData.length).toLocaleString() : '0'}
+            </p>
+            <p className="text-sm text-blue-700">MAD Moyenne/Mois</p>
+            <p className="text-xs text-gray-500">6 derniers mois</p>
+          </div>
+          
+        </div>
+      </div>
+      
+
       {/* Graphiques */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Évolution des ventes */}
