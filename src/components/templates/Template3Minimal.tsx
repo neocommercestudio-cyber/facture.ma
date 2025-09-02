@@ -36,7 +36,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
           <img
             src={user.company.logo}
             alt="Logo"
-            className="h-20 w-30 mb-4"
+            className="h-20 w-30 mx-auto "
           />
         )}
         <h1 className="text-5xl font-extrabold text-[#0a1f44]">
