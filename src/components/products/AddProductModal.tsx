@@ -187,12 +187,33 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
             </label>
             <input
               type="number"
+              name="initialStock"
+              value={formData.initialStock}
+              onChange={handleChange}
+              min="0"
+              step="0.001"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              placeholder="Stock de départ"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Stock actuel (optionnel)
+            </label>
+            <input
+              type="number"
               name="stock"
               value={formData.stock}
               onChange={handleChange}
               min="0"
+              step="0.001"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              placeholder="Laisser vide pour utiliser le stock initial"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Si vide, le stock actuel sera égal au stock initial
+            </p>
           </div>
           
           <div>

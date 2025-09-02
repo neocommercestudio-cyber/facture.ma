@@ -13,10 +13,18 @@ export default function ProductsList() {
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
 
   const getStatusBadge = (product: typeof products[0]) => {
-    if (product.stock <= product.minStock) {
+    const stats = getProductStats(product.id);
+    if (stats.remainingStock <= product.minStock) {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
           Stock Faible
+        </span>
+      );
+    }
+    if (stats.remainingStock === 0) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+          Rupture
         </span>
       );
     }
