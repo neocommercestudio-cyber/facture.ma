@@ -38,7 +38,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
             <h1 className="text-4xl font-extrabold uppercase tracking-wide">
               {user?.company.name}
             </h1>
-            <h2 className="text-2xl font-semibold mt-5 tracking-widest">
+            <h2 className="text-3xl font-semibold mt-5 tracking-widest">
               {type === 'invoice' ? 'FACTURE' : 'DEVIS'}
             </h2>
           </div>
@@ -169,14 +169,15 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
         </div>
       </div>
 
-    {/* SIGNATURE (agrandi) */}
-<div className="px-8 py-6">
-  <div className="flex justify-between">
-    <div className="w-90 border-2 border-dashed border-[#24445C] rounded-lg h-40 flex items-center justify-center">
-      <span className="text-gray-400 text-lg">Signature</span>
-    </div>
-  </div>
-</div>
+      
+      {/* SIGNATURE (inchangé) */}
+      <div className="px-8 py-6">
+        <div className="flex justify-between">
+          <div className="w-64 border-2 border-dashed border-[#24445C] rounded-lg h-28 flex items-center justify-center">
+            <span className="text-gray-400">Signature </span>
+          </div>
+        </div>
+      </div>
 
       {/* FOOTER avec vague blanche en haut */}
       <div className="relative bg-[#24445C] text-white">
