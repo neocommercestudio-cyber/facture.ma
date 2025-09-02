@@ -25,6 +25,7 @@ export default function EditEmployeeModal({ isOpen, onClose, employee }: EditEmp
   const positions = [
     'Directeur Général',
     'Responsable Commercial',
+    'Ingenieur',
     'Comptable',
     'Vendeur',
     'Technicien',
