@@ -95,10 +95,10 @@ export default function Template5Premium({ data, type }: TemplateProps) {
           </thead>
           <tbody>
             {data.items.map((item, index) => (
-              <tr key={index} className="border-t border-[#0a1f44]">
-                <td className="px-4 py-2 text-center">{item.description}</td>
-                <td className="px-4 py-2 text-center">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
-                <td className="px-4 py-2 text-center">{item.unitPrice.toFixed(2)} MAD</td>
+              <tr key={index} className="border-t border-[#0a1f44] text-sm">
+                <td className="px-4 py-2 text-center text-sm">{item.description}</td>
+                <td className="px-4 py-2 text-center text-sm">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
+                <td className="px-4 py-2 text-center text-sm">{item.unitPrice.toFixed(2)} MAD</td>
                 <td className="px-4 py-2 text-center font-semibold">
                   {item.total.toFixed(2)} MAD
                 </td>
