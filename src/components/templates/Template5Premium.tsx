@@ -33,7 +33,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
 
     {/* Nom + Titre */}
     <div className="flex-1 text-center">
-      <h1 className="text-5xl font-extrabold">{user?.company.name}</h1>
+      <h1 className="text-4xl font-extrabold">{user?.company.name}</h1>
       <h2 className="text-3xl font-bold mt-6 uppercase tracking-wide">
         {type === 'invoice' ? 'FACTURE' : 'DEVIS'}
       </h2>
