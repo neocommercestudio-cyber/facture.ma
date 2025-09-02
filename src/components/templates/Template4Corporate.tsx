@@ -172,7 +172,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
     {/* SIGNATURE (agrandi) */}
 <div className="px-8 py-6">
   <div className="flex justify-between">
-    <div className="w-84 border-2 border-dashed border-[#24445C] rounded-lg h-30 flex items-center justify-center">
+    <div className="w-84 border-2 border-dashed border-[#24445C] rounded-lg h-40 flex items-center justify-center">
       <span className="text-gray-400 text-lg">Signature</span>
     </div>
   </div>
