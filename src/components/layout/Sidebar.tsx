@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileCheck,
-  TrendingUp
+  TrendingUp,
   UserCheck
 } from 'lucide-react';
 
