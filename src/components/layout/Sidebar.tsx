@@ -140,7 +140,7 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
                       {open && (
                         <div className="flex items-center space-x-2">
                           <span className="font-medium ">{item.label}</span>
-                          <span className="text-xs bg-red-100 text-red-900 px-1.5 py-0.5 rounded-full font-bold">
+                          <span className="text-xs bg-red-800 text-red-900 px-1.5 py-0.5 rounded-full font-bold">
                             🔒
                           </span>
                         </div>
