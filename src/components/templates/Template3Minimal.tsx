@@ -113,7 +113,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
             <div className="text-base font-bold pt-3 text-center text-[#0a1f44]">
               <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
-            <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#0a1f44] text-[#0a1f44]">
+            <div className="flex justify-between text-base font-bold border-t pt-2 border-[#0a1f44] text-[#0a1f44]">
               <p>• {data.totalInWords}</p>
             </div>
           </div>
