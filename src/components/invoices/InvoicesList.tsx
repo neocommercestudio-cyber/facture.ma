@@ -578,106 +578,106 @@ export default function InvoicesList() {
                 </div>
 
                 {/* Tableau des factures de l'année - Collapsible */}
-                <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 ${
-                  expandedYears[year] ? 'max-h-none opacity-100' : 'max-h-0 opacity-0'
-                }`}>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Facture
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Client
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date émission
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Montant TTC
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Statut
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {yearInvoices.map((invoice) => (
-                          <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">{invoice.number}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">{invoice.client.name}</div>
-                                <div className="text-xs text-gray-500">ICE: {invoice.client.ice}</div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {new Date(invoice.date).toLocaleDateString('fr-FR')}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {invoice.totalTTC.toLocaleString()} MAD
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div>
-                                {getStatusBadge(invoice.status)}
-                                {invoice.status === 'paid' && invoice.paymentMethod && (
-                                  <div className="text-xs text-gray-500 mt-1">
-                                    {getPaymentMethodLabel(invoice.paymentMethod)}
-                                  </div>
-                                )}
-                                {invoice.status === 'collected' && (
-                                  <div className="text-xs text-gray-500 mt-1">
-                                    {invoice.collectionDate && new Date(invoice.collectionDate).toLocaleDateString('fr-FR')}
-                                    {invoice.collectionType && ` (${invoice.collectionType})`}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center space-x-3">
-                                <button 
-                                  onClick={() => setStatusModalInvoice(invoice.id)}
-                                  className="text-purple-600 hover:text-purple-700 transition-colors" 
-                                  title="Statut"
-                                >
-                                  <CreditCard className="w-4 h-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleViewInvoice(invoice.id)}
-                                  className="text-blue-600 hover:text-blue-700 transition-colors" 
-                                  title="Voir"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                                
-                                <button 
-                                  onClick={() => handleEditInvoice(invoice.id)}
-                                  className="text-amber-600 hover:text-amber-700 transition-colors" 
-                                  title="Modifier"
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleDeleteInvoice(invoice.id)}
-                                  className="text-red-600 hover:text-red-700 transition-colors" 
-                                  title="Supprimer"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </td>
+                {expandedYears[year] && (
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Facture
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Client
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Date émission
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Montant TTC
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Statut
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {yearInvoices.map((invoice) => (
+                            <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">{invoice.number}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900">{invoice.client.name}</div>
+                                  <div className="text-xs text-gray-500">ICE: {invoice.client.ice}</div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {new Date(invoice.date).toLocaleDateString('fr-FR')}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {invoice.totalTTC.toLocaleString()} MAD
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div>
+                                  {getStatusBadge(invoice.status)}
+                                  {invoice.status === 'paid' && invoice.paymentMethod && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {getPaymentMethodLabel(invoice.paymentMethod)}
+                                    </div>
+                                  )}
+                                  {invoice.status === 'collected' && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {invoice.collectionDate && new Date(invoice.collectionDate).toLocaleDateString('fr-FR')}
+                                      {invoice.collectionType && ` (${invoice.collectionType})`}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div className="flex items-center space-x-3">
+                                  <button 
+                                    onClick={() => setStatusModalInvoice(invoice.id)}
+                                    className="text-purple-600 hover:text-purple-700 transition-colors" 
+                                    title="Statut"
+                                  >
+                                    <CreditCard className="w-4 h-4" />
+                                  </button>
+                                  <button 
+                                    onClick={() => handleViewInvoice(invoice.id)}
+                                    className="text-blue-600 hover:text-blue-700 transition-colors" 
+                                    title="Voir"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleEditInvoice(invoice.id)}
+                                    className="text-amber-600 hover:text-amber-700 transition-colors" 
+                                    title="Modifier"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDeleteInvoice(invoice.id)}
+                                    className="text-red-600 hover:text-red-700 transition-colors" 
+                                    title="Supprimer"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           })
