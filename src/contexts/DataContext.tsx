@@ -98,11 +98,55 @@ export interface InvoiceItem {
   unit?: string;
 }
 
+export interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  position: string;
+  email: string;
+  phone: string;
+  hireDate: string;
+  baseSalary: number;
+  annualLeaveDays: number;
+  status: 'active' | 'inactive';
+  createdAt: string;
+  entrepriseId: string;
+}
+
+export interface Overtime {
+  id: string;
+  employeeId: string;
+  employee: Employee;
+  date: string;
+  hours: number;
+  rate: number;
+  total: number;
+  description?: string;
+  createdAt: string;
+  entrepriseId: string;
+}
+
+export interface Leave {
+  id: string;
+  employeeId: string;
+  employee: Employee;
+  startDate: string;
+  endDate: string;
+  type: 'annual' | 'sick' | 'maternity' | 'other';
+  days: number;
+  status: 'pending' | 'approved' | 'rejected';
+  reason?: string;
+  createdAt: string;
+  entrepriseId: string;
+}
 interface DataContextType {
   clients: Client[];
   products: Product[];
   invoices: Invoice[];
   quotes: Quote[];
+  employees: Employee[];
+  overtimes: Overtime[];
+  leaves: Leave[];
   addClient: (client: Omit<Client, 'id' | 'createdAt' | 'entrepriseId'>) => Promise<void>;
   updateClient: (id: string, client: Partial<Client>) => Promise<void>;
   deleteClient: (id: string) => Promise<void>;
@@ -117,10 +161,20 @@ interface DataContextType {
   deleteQuote: (id: string) => Promise<void>;
   convertQuoteToInvoice: (quoteId: string) => Promise<void>;
   updateProductStock: (productName: string, quantity: number) => Promise<void>;
+  addEmployee: (employee: Omit<Employee, 'id' | 'createdAt' | 'entrepriseId'>) => Promise<void>;
+  updateEmployee: (id: string, employee: Partial<Employee>) => Promise<void>;
+  deleteEmployee: (id: string) => Promise<void>;
+  addOvertime: (overtime: Omit<Overtime, 'id' | 'createdAt' | 'entrepriseId'>) => Promise<void>;
+  updateOvertime: (id: string, overtime: Partial<Overtime>) => Promise<void>;
+  deleteOvertime: (id: string) => Promise<void>;
+  addLeave: (leave: Omit<Leave, 'id' | 'createdAt' | 'entrepriseId'>) => Promise<void>;
+  updateLeave: (id: string, leave: Partial<Leave>) => Promise<void>;
+  deleteLeave: (id: string) => Promise<void>;
   getClientById: (id: string) => Client | undefined;
   getProductById: (id: string) => Product | undefined;
   getInvoiceById: (id: string) => Invoice | undefined;
   getQuoteById: (id: string) => Quote | undefined;
+  getEmployeeById: (id: string) => Employee | undefined;
   isLoading: boolean;
 }
 
@@ -132,6 +186,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [overtimes, setOvertimes] = useState<Overtime[]>([]);
+  const [leaves, setLeaves] = useState<Leave[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Écouter les changements en temps réel
@@ -194,11 +251,52 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     });
 
+    // Employés
+    const employeesQuery = query(
+      collection(db, 'employees'),
+      where('entrepriseId', '==', entrepriseId)
+    );
+    const unsubscribeEmployees = onSnapshot(employeesQuery, (snapshot) => {
+      const employeesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Employee)).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setEmployees(employeesData);
+    });
+
+    // Heures supplémentaires
+    const overtimesQuery = query(
+      collection(db, 'overtimes'),
+      where('entrepriseId', '==', entrepriseId)
+    );
+    const unsubscribeOvertimes = onSnapshot(overtimesQuery, (snapshot) => {
+      const overtimesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Overtime)).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setOvertimes(overtimesData);
+    });
+
+    // Congés
+    const leavesQuery = query(
+      collection(db, 'leaves'),
+      where('entrepriseId', '==', entrepriseId)
+    );
+    const unsubscribeLeaves = onSnapshot(leavesQuery, (snapshot) => {
+      const leavesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Leave)).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setLeaves(leavesData);
+    });
     return () => {
       unsubscribeClients();
       unsubscribeProducts();
       unsubscribeInvoices();
       unsubscribeQuotes();
+      unsubscribeEmployees();
+      unsubscribeOvertimes();
+      unsubscribeLeaves();
     };
   }, [isAuthenticated, user]);
 
@@ -470,12 +568,117 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const getProductById = (id: string) => products.find(product => product.id === id);
   const getInvoiceById = (id: string) => invoices.find(invoice => invoice.id === id);
   const getQuoteById = (id: string) => quotes.find(quote => quote.id === id);
+  const getEmployeeById = (id: string) => employees.find(employee => employee.id === id);
 
+  // Employés
+  const addEmployee = async (employeeData: Omit<Employee, 'id' | 'createdAt' | 'entrepriseId'>) => {
+    if (!user) return;
+    
+    try {
+      await addDoc(collection(db, 'employees'), {
+        ...employeeData,
+        entrepriseId: user.id,
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'employé:', error);
+    }
+  };
+
+  const updateEmployee = async (id: string, employeeData: Partial<Employee>) => {
+    try {
+      await updateDoc(doc(db, 'employees', id), {
+        ...employeeData,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'employé:', error);
+    }
+  };
+
+  const deleteEmployee = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'employees', id));
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'employé:', error);
+    }
+  };
+
+  // Heures supplémentaires
+  const addOvertime = async (overtimeData: Omit<Overtime, 'id' | 'createdAt' | 'entrepriseId'>) => {
+    if (!user) return;
+    
+    try {
+      await addDoc(collection(db, 'overtimes'), {
+        ...overtimeData,
+        entrepriseId: user.id,
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout des heures supplémentaires:', error);
+    }
+  };
+
+  const updateOvertime = async (id: string, overtimeData: Partial<Overtime>) => {
+    try {
+      await updateDoc(doc(db, 'overtimes', id), {
+        ...overtimeData,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des heures supplémentaires:', error);
+    }
+  };
+
+  const deleteOvertime = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'overtimes', id));
+    } catch (error) {
+      console.error('Erreur lors de la suppression des heures supplémentaires:', error);
+    }
+  };
+
+  // Congés
+  const addLeave = async (leaveData: Omit<Leave, 'id' | 'createdAt' | 'entrepriseId'>) => {
+    if (!user) return;
+    
+    try {
+      await addDoc(collection(db, 'leaves'), {
+        ...leaveData,
+        entrepriseId: user.id,
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du congé:', error);
+    }
+  };
+
+  const updateLeave = async (id: string, leaveData: Partial<Leave>) => {
+    try {
+      await updateDoc(doc(db, 'leaves', id), {
+        ...leaveData,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du congé:', error);
+    }
+  };
+
+  const deleteLeave = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'leaves', id));
+    } catch (error) {
+      console.error('Erreur lors de la suppression du congé:', error);
+    }
+  };
   const value = {
     clients,
     products,
     invoices,
     quotes,
+    employees,
+    overtimes,
+    leaves,
     addClient,
     updateClient,
     deleteClient,
@@ -490,10 +693,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
     deleteQuote,
     convertQuoteToInvoice,
     updateProductStock,
+    addEmployee,
+    updateEmployee,
+    deleteEmployee,
+    addOvertime,
+    updateOvertime,
+    deleteOvertime,
+    addLeave,
+    updateLeave,
+    deleteLeave,
     getClientById,
     getProductById,
     getInvoiceById,
     getQuoteById,
+    getEmployeeById,
     updateInvoiceStatus: updateInvoice,
     isLoading,
   };

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   FileCheck,
   TrendingUp
+  UserCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -47,6 +48,7 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
       path: '/stock-management',
       isPro: true 
     }] : []),
+    { icon: UserCheck, label: 'Gestion Humaine', path: '/hr-management' },
     { icon: BarChart3, label: t('reports'), path: '/reports' },
     { icon: Settings, label: t('settings'), path: '/settings' },
   ];
