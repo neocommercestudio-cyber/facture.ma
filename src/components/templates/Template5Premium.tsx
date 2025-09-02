@@ -62,7 +62,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
       <div className="p-8 border-b border-black">
         <div className="grid grid-cols-2 gap-8">
           <div className="bg-gray-50 p-6 rounded border border-black">
-            <h3 className="font-boldtext-sm text-black mb-3 border-b border-black pb-2 text-center">
+            <h3 className="font-bold text-sm text-black mb-3 border-b border-black pb-2 text-center">
               CLIENT : {data.client.name} {data.client.address}
             </h3>
             <div className=" text-black space-y-1 text-center">
