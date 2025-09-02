@@ -24,6 +24,7 @@ export default function AddEmployeeModal({ isOpen, onClose }: AddEmployeeModalPr
   const positions = [
     'Directeur Général',
     'Responsable Commercial',
+    'Ingenieur',
     'Comptable',
     'Vendeur',
     'Technicien',
