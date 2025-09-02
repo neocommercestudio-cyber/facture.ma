@@ -110,7 +110,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
         <div className="flex justify-between">
           {/* Bloc gauche */}
           <div className="w-80 bg-white rounded border border-[#0a1f44] p-4 shadow-sm">
-            <div className="text-lg font-bold pt-3 text-center text-[#0a1f44]">
+            <div className="text-base font-bold pt-3 text-center text-[#0a1f44]">
               <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
             </div>
             <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#0a1f44] text-[#0a1f44]">
@@ -126,7 +126,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
                 {data.subtotal.toFixed(2)} MAD
               </span>
             </div>
-            <div className="text-lg mb-2">
+            <div className="text-base mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
