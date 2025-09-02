@@ -14,7 +14,8 @@ import {
   Filter,
   CheckCircle,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  LayoutDashboard
 } from 'lucide-react';
 import AddEmployeeModal from './AddEmployeeModal';
 import AddOvertimeModal from './AddOvertimeModal';
