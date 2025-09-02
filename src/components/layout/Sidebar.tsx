@@ -55,8 +55,14 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
       path: '/hr-management',
       isPro: true 
     }] : []),
+
+       ...(isProActive ? [{ 
+      icon: BarChart3, 
+      label: 'reports', 
+      path: '/reports',
+      isPro: true 
+    }] : []),
     
-    { icon: BarChart3, label: t('reports'), path: '/reports' },
     { icon: Settings, label: t('settings'), path: '/settings' },
   ];
 
