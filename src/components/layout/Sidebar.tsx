@@ -48,7 +48,14 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
       path: '/stock-management',
       isPro: true 
     }] : []),
-    { icon: UserCheck, label: 'Gestion Humaine', path: '/hr-management' },
+    
+     ...(isProActive ? [{ 
+      icon: UserCheck, 
+      label: 'Gestion Humaine', 
+      path: '/hr-management',
+      isPro: true 
+    }] : []),
+    
     { icon: BarChart3, label: t('reports'), path: '/reports' },
     { icon: Settings, label: t('settings'), path: '/settings' },
   ];
