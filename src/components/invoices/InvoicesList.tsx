@@ -156,7 +156,31 @@ export default function InvoicesList() {
     setEditingInvoice(null);
   };
 
+  const handleUpdateStatus = (id: string, status: string, paymentMethod?: string, collectionDate?: string, collectionType?: string) => {
+    const updateData: any = { status };
+    
+    if (status === 'paid' && paymentMethod) {
+      updateData.paymentMethod = paymentMethod;
+    }
+    
+    if (status === 'collected' && collectionDate && collectionType) {
+      updateData.collectionDate = collectionDate;
+      updateData.collectionType = collectionType;
+    }
+    
+    updateInvoice(id, updateData);
+    setStatusModalInvoice(null);
+  };
 
+  const getPaymentMethodLabel = (method: string) => {
+    const labels = {
+      'bank_transfer': 'Virement',
+      'cash': 'Espèces',
+      'check': 'Chèque',
+      'promissory_note': 'Effet'
+    };
+    return labels[method as keyof typeof labels] || method;
+  };
   const generateTemplateHTMLWithTemplate = (invoice: any, templateId: string) => {
     // Générer le HTML selon le template spécifié
     let templateContent = '';
