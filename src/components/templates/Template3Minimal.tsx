@@ -160,7 +160,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
     ));
   })()}
 </div>
-            <div className="flex justify-between text-lg font-bold border-t pt-2 border-[#0a1f44] text-[#0a1f44]">
+            <div className="flex justify-between text-sm font-bold border-t pt-2 border-[#0a1f44] text-[#0a1f44]">
               <span>TOTAL TTC :</span>
               <span>{data.totalTTC.toFixed(2)} MAD</span>
             </div>
