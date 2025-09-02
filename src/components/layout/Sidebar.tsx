@@ -28,6 +28,13 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
   const { licenseType } = useLicense();
   const { user } = useAuth();
 
+  // Vérifier si l'abonnement Pro est actif et non expiré
+  const isProActive = user?.company.subscription === 'pro' && user?.company.expiryDate && 
+    new Date(user.company.expiryDate) > new Date();
+  
+  // Vérifier si l'activation est en cours
+  const isActivationPending = localStorage.getItem('proActivationPending') === 'true';
+
   const menuItems = [
     { icon: LayoutDashboard, label: t('dashboard'), path: '/dashboard' },
     { icon: FileText, label: t('invoices'), path: '/invoices' },
@@ -39,13 +46,6 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
     { icon: Settings, label: t('settings'), path: '/settings' },
   ];
 
-  // Vérifier si l'abonnement Pro est actif et non expiré
-  const isProActive = user?.company.subscription === 'pro' && user?.company.expiryDate && 
-    new Date(user.company.expiryDate) > new Date();
-  
-  // Vérifier si l'activation est en cours
-  const isActivationPending = localStorage.getItem('proActivationPending') === 'true';
-  
   return (
     <>
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
