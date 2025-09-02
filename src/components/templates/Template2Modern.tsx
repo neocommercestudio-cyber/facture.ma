@@ -98,7 +98,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
 
           {/* Bloc droit */}
           <div className="w-80 bg-gray-50 border border-black rounded p-6">
-            <div className="flex justify-between text-lg mb-2">
+            <div className="flex justify-between text-sm mb-2">
               <span>Total HT :</span>
               <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
             </div>
