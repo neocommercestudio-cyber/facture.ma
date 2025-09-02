@@ -74,8 +74,8 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
         allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 800,
-        height: 1200
+        width: 794,
+        height: 1123
       },
       jsPDF: { 
         unit: 'mm', 
@@ -94,6 +94,8 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
         alert('Erreur lors de la génération du PDF');
       });
   };
+
+  
 
   const generateTemplateHTMLWithSelectedTemplate = () => {
     // Générer le HTML selon le template sélectionné
