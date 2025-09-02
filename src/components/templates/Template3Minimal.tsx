@@ -119,7 +119,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
 
           {/* Bloc droit */}
           <div className="w-80 bg-white rounded border border-[#0a1f44] p-4 shadow-sm">
-            <div className="flex justify-between mb-2">
+            <div className="flex justify-between mb-2 text-sm">
               <span>Total HT :</span>
               <span className="font-medium">
                 {data.subtotal.toFixed(2)} MAD
