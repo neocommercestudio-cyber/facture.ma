@@ -92,10 +92,10 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
               >
                 <td className="px-4 py-2 text-center text-sm">{item.description}</td>
                 <td className="px-4 py-2 text-center text-sm">{item.quantity.toFixed(3)} ({item.unit || 'unité'})</td>
-                <td className="px-4 py-2 text-center">
+                <td className="px-4 py-2 text-center text-sm">
                   {item.unitPrice.toFixed(2)} MAD
                 </td>
-                <td className="px-4 py-2 text-center font-semibold">
+                <td className="px-4 py-2 text-center font-semibold text-sm">
                   {item.total.toFixed(2)} MAD
                 </td>
               </tr>
