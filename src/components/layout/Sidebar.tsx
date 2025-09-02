@@ -83,9 +83,8 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
             {open && (
               <div>
                 <h1 className="text-lg font-bold text-gray-900">Facture.ma</h1>
-                <p className="text-xs text-gray-500">ERP Morocco</p>
-                  <p className="text-xs text-gray-500">V.1.25.0</p>
-              </div>
+                <p className="text-xs text-gray-500">ERP Morocco (V.1.25.0)</p>
+*              </div>
             )}
           </div>
           <button
