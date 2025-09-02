@@ -42,17 +42,17 @@ export default function ProductsList() {
 
   const getStatusBadge = (product: typeof products[0]) => {
     const stats = getProductStats(product.id);
+    if (stats.remainingStock <= 0) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+          Rupture
+        </span>
+      );
+    }
     if (stats.remainingStock <= product.minStock) {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
           Stock Faible
-        </span>
-      );
-    }
-    if (stats.remainingStock === 0) {
-      return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-          Rupture
         </span>
       );
     }
@@ -147,9 +147,6 @@ export default function ProductsList() {
                   Produit
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  SKU / Catégorie
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Prix Achat
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -157,7 +154,13 @@ export default function ProductsList() {
                 </th>
               
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stock / Unité
+                  Stock Initial
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Commandes
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Stock Restant
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Statut
@@ -169,15 +172,14 @@ export default function ProductsList() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredProducts.map((product) => (
+                const stats = getProductStats(product.id);
+                
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="font-medium text-gray-900">{product.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.sku}</div>
                     <div className="text-xs text-gray-500">{product.category}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {product.purchasePrice.toLocaleString()} MAD
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -185,18 +187,33 @@ export default function ProductsList() {
                   </td>
                  
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {product.stock.toFixed(3)} {product.unit || 'unité'}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Min: {product.minStock.toFixed(3)} {product.unit || 'unité'}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {stats.ordersCount} commande{stats.ordersCount > 1 ? 's' : ''}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {stats.totalOrdered.toFixed(3)} {product.unit || 'unité'} commandé{stats.totalOrdered > 1 ? 's' : ''}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <span className={`text-sm font-medium ${
-                        product.stock <= product.minStock ? 'text-red-600' : 'text-gray-900'
+                        stats.remainingStock <= product.minStock ? 'text-red-600' : 'text-gray-900'
                       }`}>
-                        {product.stock.toFixed(3)} {product.unit || 'unité'}
+                        {stats.remainingStock.toFixed(3)} {product.unit || 'unité'}
                       </span>
-                      {product.stock <= product.minStock && (
+                      {stats.remainingStock <= product.minStock && (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
                       )}
                     </div>
-                    <div className="text-xs text-gray-500">Min: {product.minStock.toFixed(3)} {product.unit || 'unité'}</div>
-                    {product.stock === 0 && (
+                    {stats.remainingStock <= 0 && (
                       <div className="text-xs text-red-600 font-medium">Rupture de stock</div>
                     )}
                   </td>
