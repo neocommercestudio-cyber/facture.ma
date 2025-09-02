@@ -86,7 +86,7 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
       {/* TABLE PRODUITS (inchangé) */}
       <div className="p-8 border-b border-[#24445C]">
         <table className="w-full border border-[#24445C] rounded">
-          <thead className="bg-[#24445C] text-white">
+          <thead className="bg-[#24445C] text-white text-sm">
             <tr>
               <th className="px-4 py-2 text-center">Description</th>
               <th className="px-4 py-2 text-center">Quantité</th>
