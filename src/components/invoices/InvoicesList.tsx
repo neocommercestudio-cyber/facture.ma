@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useLicense } from '../../contexts/LicenseContext';
@@ -14,6 +15,7 @@ export default function InvoicesList() {
   const { t } = useLanguage();
   const { licenseType } = useLicense();
   const { invoices, deleteInvoice, updateInvoice } = useData();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewingInvoice, setViewingInvoice] = useState<string | null>(null);
@@ -80,6 +82,28 @@ export default function InvoicesList() {
     const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // Grouper les factures par année
+  const invoicesByYear = filteredInvoices.reduce((acc, invoice) => {
+    const year = new Date(invoice.createdAt).getFullYear();
+    if (!acc[year]) {
+      acc[year] = [];
+    }
+    acc[year].push(invoice);
+    return acc;
+  }, {} as Record<number, typeof filteredInvoices>);
+
+  // Calculer les statistiques par année
+  const getYearStats = (yearInvoices: typeof filteredInvoices) => {
+    const count = yearInvoices.length;
+    const totalTTC = yearInvoices.reduce((sum, invoice) => sum + invoice.totalTTC, 0);
+    return { count, totalTTC };
+  };
+
+  // Trier les années par ordre décroissant
+  const sortedYears = Object.keys(invoicesByYear)
+    .map(Number)
+    .sort((a, b) => b - a);
 
   const handleDeleteInvoice = (id: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
@@ -496,108 +520,146 @@ export default function InvoicesList() {
       </div>
 
       {/* Invoices Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Facture
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Client
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date émission
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Montant TTC
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Statut
-                </th>
-               
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredInvoices.map((invoice) => (
-                <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{invoice.number}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{invoice.client.name}</div>
-                      <div className="text-xs text-gray-500">ICE: {invoice.client.ice}</div>
+      {/* Blocs par année */}
+      <div className="space-y-6">
+        {sortedYears.length > 0 ? (
+          sortedYears.map((year) => {
+            const yearInvoices = invoicesByYear[year];
+            const stats = getYearStats(yearInvoices);
+            
+            return (
+              <div key={year} className="space-y-4">
+                {/* Bloc statistiques de l'année */}
+                <div className="bg-gradient-to-r from-teal-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <FileText className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold">Factures - {year}</h2>
+                        <p className="text-sm opacity-90">Résumé de l'année {year}</p>
+                      </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(invoice.date).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {invoice.totalTTC.toLocaleString()} MAD
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      {getStatusBadge(invoice.status)}
-                      {invoice.status === 'paid' && invoice.paymentMethod && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          {getPaymentMethodLabel(invoice.paymentMethod)}
+                    <div className="text-right">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="text-center">
+                          <p className="text-3xl font-bold">{stats.count}</p>
+                          <p className="text-sm opacity-90">Factures</p>
                         </div>
-                      )}
-                      {invoice.status === 'collected' && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          {invoice.collectionDate && new Date(invoice.collectionDate).toLocaleDateString('fr-FR')}
-                          {invoice.collectionType && ` (${invoice.collectionType})`}
+                        <div className="text-center">
+                          <p className="text-3xl font-bold">{stats.totalTTC.toLocaleString()}</p>
+                          <p className="text-sm opacity-90">MAD Total TTC</p>
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </td>
-                 
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center space-x-3">
-                      <button 
-                        onClick={() => setStatusModalInvoice(invoice.id)}
-                        className="text-purple-600 hover:text-purple-700 transition-colors" 
-                        title="Statut"
-                      >
-                        <CreditCard className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleViewInvoice(invoice.id)}
-                        className="text-blue-600 hover:text-blue-700 transition-colors" 
-                        title="Voir"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      
-                      <button 
-                        onClick={() => handleEditInvoice(invoice.id)}
-                        className="text-amber-600 hover:text-amber-700 transition-colors" 
-                        title="Modifier"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteInvoice(invoice.id)}
-                        className="text-red-600 hover:text-red-700 transition-colors" 
-                        title="Supprimer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
 
-        {filteredInvoices.length === 0 && (
-          <div className="text-center py-12">
+                {/* Tableau des factures de l'année */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Facture
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Client
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date émission
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Montant TTC
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Statut
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {yearInvoices.map((invoice) => (
+                          <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{invoice.number}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{invoice.client.name}</div>
+                                <div className="text-xs text-gray-500">ICE: {invoice.client.ice}</div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {new Date(invoice.date).toLocaleDateString('fr-FR')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              {invoice.totalTTC.toLocaleString()} MAD
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div>
+                                {getStatusBadge(invoice.status)}
+                                {invoice.status === 'paid' && invoice.paymentMethod && (
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {getPaymentMethodLabel(invoice.paymentMethod)}
+                                  </div>
+                                )}
+                                {invoice.status === 'collected' && (
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {invoice.collectionDate && new Date(invoice.collectionDate).toLocaleDateString('fr-FR')}
+                                    {invoice.collectionType && ` (${invoice.collectionType})`}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <div className="flex items-center space-x-3">
+                                <button 
+                                  onClick={() => setStatusModalInvoice(invoice.id)}
+                                  className="text-purple-600 hover:text-purple-700 transition-colors" 
+                                  title="Statut"
+                                >
+                                  <CreditCard className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  onClick={() => handleViewInvoice(invoice.id)}
+                                  className="text-blue-600 hover:text-blue-700 transition-colors" 
+                                  title="Voir"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                
+                                <button 
+                                  onClick={() => handleEditInvoice(invoice.id)}
+                                  className="text-amber-600 hover:text-amber-700 transition-colors" 
+                                  title="Modifier"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteInvoice(invoice.id)}
+                                  className="text-red-600 hover:text-red-700 transition-colors" 
+                                  title="Supprimer"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <p className="text-gray-500">Aucune facture trouvée</p>
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg max-w-md mx-auto">
               <p className="text-sm text-blue-800">
