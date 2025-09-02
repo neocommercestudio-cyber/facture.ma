@@ -52,7 +52,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
       <div className="p-8 border-b border-[#0a1f44] relative z-10">
         <div className="grid grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded border border-[#0a1f44] shadow-sm">
-            <h3 className="font-bold text-base text-[#0a1f44] mb-3 border-b border-[#0a1f44] pb-2 text-center">
+            <h3 className="font-bold text-base text-[#0a1f44] mb-3 border-b border-[#0a1f44] pb-2 text-center text-sm">
               CLIENT : {data.client.name} {data.client.address}
             </h3>
             <div className="text-base text-gray-700 space-y-1 text-center">
