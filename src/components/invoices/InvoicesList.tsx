@@ -9,6 +9,7 @@ import EditInvoice from './EditInvoice';
 import InvoiceStatusModal from './InvoiceStatusModal';
 import ProTemplateModal from '../license/ProTemplateModal';
 import { Plus, Search, Filter, Download, Eye, Edit, Trash2, Crown, CreditCard, FileText } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 export default function InvoicesList() {
