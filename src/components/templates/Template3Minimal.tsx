@@ -76,7 +76,7 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
       {/* TABLE PRODUITS */}
       <div className="p-8 border-b border-[#0a1f44] relative z-10">
         <table className="w-full border border-[#0a1f44] rounded overflow-hidden">
-          <thead className="bg-[#0a1f44] text-white">
+          <thead className="bg-[#0a1f44] text-white text-sm">
             <tr>
               <th className="px-4 py-2 text-center">Description</th>
               <th className="px-4 py-2 text-center">Quantité</th>
