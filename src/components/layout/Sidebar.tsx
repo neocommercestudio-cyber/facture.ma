@@ -181,7 +181,7 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
             </button>
           )}
            <div>
-                <h1 className="text-lg font-bold text-gray-900">(V.1.25.0</h1>
+                <h1 className="text-xs font-bold text-gray-900">V.1.25.0</h1>
           </div>
         </div>
         
