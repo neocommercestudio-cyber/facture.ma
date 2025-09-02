@@ -65,7 +65,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
             <h3 className="font-bold text-sm text-black mb-3 border-b border-black pb-2 text-center">
               CLIENT : {data.client.name} {data.client.address}
             </h3>
-            <div className=" text-black space-y-1 text-center">
+            <div className=" text-black space-y-1 text-sm text-center">
               <p><strong>ICE:</strong> {data.client.ice}</p>
             </div>
           </div>
