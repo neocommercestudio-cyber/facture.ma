@@ -24,6 +24,14 @@ export default function InvoicesList() {
   const [blockedTemplateName, setBlockedTemplateName] = useState('');
   const [showUpgradePage, setShowUpgradePage] = useState(false);
   const [statusModalInvoice, setStatusModalInvoice] = useState<string | null>(null);
+  const [expandedYears, setExpandedYears] = useState<Record<number, boolean>>({});
+
+  const toggleYearExpansion = (year: number) => {
+    setExpandedYears(prev => ({
+      ...prev,
+      [year]: !prev[year]
+    }));
+  };
 
   const isTemplateProOnly = (templateId: string = 'template1') => {
     const proTemplates = ['template2', 'template3', 'template4', 'template5'];
