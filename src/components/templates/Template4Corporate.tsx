@@ -26,8 +26,13 @@ export default function Template4Corporate({ data, type }: TemplateProps) {
       <div className="relative bg-[#24445C] text-white px-8 py-6">
         <div className="flex items-center justify-between">
           {user?.company.logo && (
-            <img src={user.company.logo} alt="Logo" className="h-30 w-auto" />
-          )}
+             <img
+    src={user.company.logo}
+    alt="Logo"
+    className="mx-auto"
+    style={{ height: "140px", width: "140px" }}
+  />
+)}
 
           <div className="flex-1 text-center">
             <h1 className="text-5xl font-extrabold uppercase tracking-wide">
