@@ -31,12 +31,12 @@ export default function Template3Minimal({ data, type }: TemplateProps) {
       />
 
       {/* HEADER */}
-      <div className="p-10 text-center relative z-10">
+      <div className="p-5 text-center relative z-5">
         {user?.company.logo && (
           <img
             src={user.company.logo}
             alt="Logo"
-            className="h-30 w-auto mx-auto mb-4"
+            className="h-10 w-auto mx-auto mb-4"
           />
         )}
         <h1 className="text-5xl font-extrabold text-[#0a1f44]">
