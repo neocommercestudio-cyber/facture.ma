@@ -87,10 +87,10 @@ export default function Template5Premium({ data, type }: TemplateProps) {
         <table className="w-full border border-[#0a1f44] rounded">
           <thead className="bg-[#0a1f44] text-white">
             <tr>
-              <th className="px-4 py-2 text-center">Description</th>
-              <th className="px-4 py-2 text-center">Quantité</th>
-              <th className="px-4 py-2 text-center">Prix Unitaire</th>
-              <th className="px-4 py-2 text-center">Total HT</th>
+              <th className="px-4 py-2 text-center text-sm">Description</th>
+              <th className="px-4 py-2 text-center text-sm">Quantité</th>
+              <th className="px-4 py-2 text-center text-sm">Prix Unitaire</th>
+              <th className="px-4 py-2 text-center text-sm">Total HT</th>
             </tr>
           </thead>
           <tbody>
