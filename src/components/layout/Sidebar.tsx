@@ -41,7 +41,12 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
     { icon: FileCheck, label: 'Devis', path: '/quotes' },
     { icon: Users, label: t('clients'), path: '/clients' },
     { icon: Package, label: t('products'), path: '/products' },
-    ...(isProActive ? [{ icon: TrendingUp, label: 'Gestion de Stock', path: '/stock-management' }] : []),
+    ...(isProActive ? [{ 
+      icon: TrendingUp, 
+      label: 'Gestion de Stock', 
+      path: '/stock-management',
+      isPro: true 
+    }] : []),
     { icon: BarChart3, label: t('reports'), path: '/reports' },
     { icon: Settings, label: t('settings'), path: '/settings' },
   ];
@@ -93,7 +98,14 @@ export default function Sidebar({ open, setOpen, onUpgrade }: SidebarProps) {
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     {open && (
-                      <span className="font-medium">{item.label}</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium">{item.label}</span>
+                        {item.isPro && (
+                          <span className="text-xs bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full font-bold">
+                            PRO
+                          </span>
+                        )}
+                      </div>
                     )}
                   </NavLink>
                 </li>

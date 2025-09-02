@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { 
   BarChart3, 
@@ -17,52 +18,80 @@ import {
 export default function Reports() {
   const { t } = useLanguage();
   const { invoices, clients, products } = useData();
+  const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [selectedReport, setSelectedReport] = useState('sales');
 
   // Calculs des statistiques
-  const totalRevenue = invoices
-    .filter(invoice => invoice.status === 'paid')
+  const paidInvoices = invoices.filter(invoice => invoice.status === 'paid');
+  const unpaidInvoices = invoices.filter(invoice => invoice.status === 'unpaid');
+  const collectedInvoices = invoices.filter(invoice => invoice.status === 'collected');
+  
+  const totalRevenue = paidInvoices
     .reduce((sum, invoice) => sum + invoice.totalTTC, 0);
 
-  const pendingRevenue = invoices
-    .filter(invoice => invoice.status === 'pending' || invoice.status === 'sent')
+  const unpaidRevenue = unpaidInvoices
     .reduce((sum, invoice) => sum + invoice.totalTTC, 0);
 
-  const totalInvoices = invoices.length;
-  const paidInvoices = invoices.filter(invoice => invoice.status === 'paid').length;
-  const pendingInvoices = invoices.filter(invoice => invoice.status === 'pending' || invoice.status === 'sent').length;
+  const collectedRevenue = collectedInvoices
+    .reduce((sum, invoice) => sum + invoice.totalTTC, 0);
 
+  // Données réelles pour l'évolution des ventes (6 derniers mois)
+  const getSalesDataForLastMonths = () => {
+    const months = [];
+    const currentDate = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString('fr-FR', { month: 'short' });
+      
+      // Calculer les ventes réelles pour ce mois
+      const monthSales = paidInvoices
+        .filter(invoice => {
+          const invoiceDate = new Date(invoice.date);
+          return invoiceDate.getMonth() === date.getMonth() && 
+                 invoiceDate.getFullYear() === date.getFullYear();
+        })
+        .reduce((sum, invoice) => sum + invoice.totalTTC, 0);
+      
+      months.push({ month: monthName, sales: monthSales });
+    }
+    
+    return months;
+  };
+
+  const monthlyData = getSalesDataForLastMonths();
+  const maxSales = Math.max(...monthlyData.map(d => d.sales), 1); // Éviter division par 0
   const lowStockProducts = products.filter(product => product.stock <= product.minStock).length;
 
   const stats = [
     {
-      title: 'Chiffre d\'Affaires Total',
-      value: `${totalRevenue.toLocaleString()} MAD`,
+      title: 'Factures Payées',
+      value: `${paidInvoices.length} (${totalRevenue.toLocaleString()} MAD)`,
       icon: DollarSign,
       color: 'from-emerald-500 to-teal-600',
-      change: '+0%'
+      change: `${totalRevenue.toLocaleString()} MAD`
     },
     {
-      title: 'Factures Payées',
-      value: paidInvoices.toString(),
+      title: 'Factures Non Payées',
+      value: `${unpaidInvoices.length} (${unpaidRevenue.toLocaleString()} MAD)`,
       icon: FileText,
-      color: 'from-blue-500 to-indigo-600',
-      change: `${totalInvoices > 0 ? Math.round((paidInvoices / totalInvoices) * 100) : 0}%`
+      color: 'from-red-500 to-pink-600',
+      change: `${unpaidRevenue.toLocaleString()} MAD`
+    },
+    {
+      title: 'Factures Encaissées',
+      value: `${collectedInvoices.length} (${collectedRevenue.toLocaleString()} MAD)`,
+      icon: FileText,
+      color: 'from-yellow-500 to-orange-600',
+      change: `${collectedRevenue.toLocaleString()} MAD`
     },
     {
       title: 'Total Clients',
       value: clients.length.toString(),
       icon: Users,
       color: 'from-violet-500 to-purple-600',
-      change: '+0%'
-    },
-    {
-      title: 'Produits Stock Faible',
-      value: lowStockProducts.toString(),
-      icon: Package,
-      color: 'from-amber-500 to-orange-600',
-      change: lowStockProducts > 0 ? 'Attention' : 'OK'
+      change: `${clients.length} clients`
     }
   ];
 
@@ -177,19 +206,19 @@ export default function Reports() {
           </div>
 
           <div className="space-y-4">
-            {['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'].map((month, index) => (
+            {monthlyData.map((data, index) => (
               <div key={index} className="flex items-center space-x-3">
                 <div className="w-8 text-sm font-medium text-gray-600">
-                  {month}
+                  {data.month}
                 </div>
                 <div className="flex-1 bg-gray-200 rounded-full h-3 relative overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-700 ease-out"
-                    style={{ width: `${Math.random() * 100}%` }}
+                    style={{ width: `${maxSales > 0 ? (data.sales / maxSales) * 100 : 0}%` }}
                   />
                 </div>
                 <div className="w-20 text-sm font-medium text-gray-900 text-right">
-                  {Math.floor(Math.random() * 50000).toLocaleString()} MAD
+                  {data.sales.toLocaleString()} MAD
                 </div>
               </div>
             ))}
@@ -214,6 +243,10 @@ export default function Reports() {
                 .filter(invoice => invoice.clientId === client.id && invoice.status === 'paid')
                 .reduce((sum, invoice) => sum + invoice.totalTTC, 0);
               
+              const clientInvoicesCount = invoices
+                .filter(invoice => invoice.clientId === client.id)
+                .length;
+              
               return (
                 <div key={client.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex items-center space-x-3">
@@ -231,7 +264,7 @@ export default function Reports() {
                       {clientRevenue.toLocaleString()} MAD
                     </p>
                     <p className="text-xs text-gray-500">
-                      {invoices.filter(inv => inv.clientId === client.id).length} factures
+                      {clientInvoicesCount} facture{clientInvoicesCount > 1 ? 's' : ''}
                     </p>
                   </div>
                 </div>
@@ -297,14 +330,15 @@ export default function Reports() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      invoice.status === 'paid' 
+                      invoice.status === 'paid' || invoice.status === 'collected'
                         ? 'bg-emerald-100 text-emerald-800'
-                        : invoice.status === 'pending'
+                        : invoice.status === 'unpaid'
                         ? 'bg-yellow-100 text-yellow-800'
                         : 'bg-red-100 text-red-800'
                     }`}>
                       {invoice.status === 'paid' ? 'Payé' : 
-                       invoice.status === 'pending' ? 'En attente' : 'En retard'}
+                       invoice.status === 'collected' ? 'Encaissé' :
+                       invoice.status === 'unpaid' ? 'Non payé' : 'Autre'}
                     </span>
                   </td>
                 </tr>
@@ -318,6 +352,38 @@ export default function Reports() {
             <p className="text-gray-500">Aucune donnée disponible pour générer des rapports</p>
           </div>
         )}
+      </div>
+
+      {/* Moyenne mensuelle */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Résumé Financier</h3>
+            <p className="text-sm text-gray-600">Performance globale</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+            <p className="text-2xl font-bold text-green-600">{totalRevenue.toLocaleString()}</p>
+            <p className="text-sm text-green-700">MAD Encaissés</p>
+            <p className="text-xs text-gray-500">{paidInvoices.length} factures payées</p>
+          </div>
+          
+          <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+            <p className="text-2xl font-bold text-red-600">{unpaidRevenue.toLocaleString()}</p>
+            <p className="text-sm text-red-700">MAD En Attente</p>
+            <p className="text-xs text-gray-500">{unpaidInvoices.length} factures non payées</p>
+          </div>
+          
+          <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-2xl font-bold text-blue-600">
+              {monthlyData.length > 0 ? Math.round(monthlyData.reduce((acc, d) => acc + d.sales, 0) / monthlyData.length).toLocaleString() : '0'}
+            </p>
+            <p className="text-sm text-blue-700">MAD Moyenne/Mois</p>
+            <p className="text-xs text-gray-500">6 derniers mois</p>
+          </div>
+        </div>
       </div>
     </div>
   );
