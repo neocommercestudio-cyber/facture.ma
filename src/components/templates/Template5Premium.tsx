@@ -110,7 +110,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
       <p className="text-sm font-bold text-[#0a1f44]">• {data.totalInWords}</p>
     </div>
   </div>
-</div>
+
 
           {/* Bloc droit */}
           <div className="w-80 bg-gray-50 rounded border border-[#0a1f44] p-4">
