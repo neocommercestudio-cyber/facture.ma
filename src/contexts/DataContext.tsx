@@ -300,86 +300,69 @@ export function DataProvider({ children }: { children: ReactNode }) {
     };
   }, [isAuthenticated, user]);
 
-  const generateInvoiceNumber = () => {
+  const generateInvoiceNumber = (invoiceDate?: string) => {
     if (!user?.company) return 'FAC-2025-001';
     
-    const currentYear = new Date().getFullYear();
+    // Utiliser l'année de la date de la facture au lieu de l'année actuelle
+    const invoiceYear = new Date(invoiceDate || new Date()).getFullYear();
     const format = user.company.invoiceNumberingFormat || 'format2';
     const prefix = user.company.invoicePrefix || 'FAC';
     
-    // Réinitialiser le compteur si nouvelle année
-    let counter = user.company.invoiceCounter || 0;
-    const lastYear = user.company.lastInvoiceYear || currentYear;
-    
-    if (currentYear > lastYear) {
-      counter = 0;
-    }
-    
-    counter += 1;
+    // Compter les factures existantes pour cette année spécifique
+    const yearInvoices = invoices.filter(invoice => 
+      new Date(invoice.date).getFullYear() === invoiceYear
+    );
+    const counter = yearInvoices.length + 1;
     const counterStr = String(counter).padStart(3, '0');
     
-    // Mettre à jour le compteur dans Firebase
-    updateCompanyInvoiceCounter(counter, currentYear);
+    // Note: Plus besoin de mettre à jour un compteur global car on compte dynamiquement
     
     // Générer le numéro selon le format choisi
     switch (format) {
       case 'format1': // 2025-001
-        return `${currentYear}-${counterStr}`;
+        return `${invoiceYear}-${counterStr}`;
       case 'format2': // FAC-2025-001
-        return `${prefix}-${currentYear}-${counterStr}`;
+        return `${prefix}-${invoiceYear}-${counterStr}`;
       case 'format3': // 001/2025
-        return `${counterStr}/${currentYear}`;
+        return `${counterStr}/${invoiceYear}`;
       case 'format4': // 2025/001-FAC
-        return `${currentYear}/${counterStr}-${prefix}`;
+        return `${invoiceYear}/${counterStr}-${prefix}`;
       case 'format5': // FAC001-2025
-        return `${prefix}${counterStr}-${currentYear}`;
+        return `${prefix}${counterStr}-${invoiceYear}`;
       default:
-        return `${prefix}-${currentYear}-${counterStr}`;
+        return `${prefix}-${invoiceYear}-${counterStr}`;
     }
   };
 
-  const updateCompanyInvoiceCounter = async (counter: number, year: number) => {
-    if (!user) return;
-    
-    try {
-      await updateDoc(doc(db, 'entreprises', user.id), {
-        invoiceCounter: counter,
-        lastInvoiceYear: year,
-        updatedAt: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du compteur:', error);
-    }
-  };
-
-  const generateQuoteNumber = () => {
+  const generateQuoteNumber = (quoteDate?: string) => {
     if (!user?.company) return 'DEV-2025-001';
     
-    const currentYear = new Date().getFullYear();
+    // Utiliser l'année de la date du devis
+    const quoteYear = new Date(quoteDate || new Date()).getFullYear();
     const format = user.company.invoiceNumberingFormat || 'format2';
     const prefix = 'DEV'; // Préfixe fixe pour les devis
     
-    // Compter les devis de l'année courante pour la numérotation
-    const currentYearQuotes = quotes.filter(quote => 
-      new Date(quote.createdAt).getFullYear() === currentYear
+    // Compter les devis de l'année spécifique pour la numérotation
+    const yearQuotes = quotes.filter(quote => 
+      new Date(quote.date).getFullYear() === quoteYear
     );
-    const counter = currentYearQuotes.length + 1;
+    const counter = yearQuotes.length + 1;
     const counterStr = String(counter).padStart(3, '0');
     
     // Générer le numéro selon le même format que les factures
     switch (format) {
       case 'format1': // 2025-001
-        return `${currentYear}-${counterStr}`;
+        return `${quoteYear}-${counterStr}`;
       case 'format2': // DEV-2025-001
-        return `${prefix}-${currentYear}-${counterStr}`;
+        return `${prefix}-${quoteYear}-${counterStr}`;
       case 'format3': // 001/2025
-        return `${counterStr}/${currentYear}`;
+        return `${counterStr}/${quoteYear}`;
       case 'format4': // 2025/001-DEV
-        return `${currentYear}/${counterStr}-${prefix}`;
+        return `${quoteYear}/${counterStr}-${prefix}`;
       case 'format5': // DEV001-2025
-        return `${prefix}${counterStr}-${currentYear}`;
+        return `${prefix}${counterStr}-${quoteYear}`;
       default:
-        return `${prefix}-${currentYear}-${counterStr}`;
+        return `${prefix}-${quoteYear}-${counterStr}`;
     }
   };
 
@@ -460,11 +443,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   // Factures
-  const addInvoice = async (invoiceData: Omit<Invoice, 'id' | 'number' | 'createdAt' | 'entrepriseId' | 'dueDate' | 'totalInWords'>) => {
+  const addInvoice = async (invoiceData: Omit<Invoice, 'id' | 'number' | 'createdAt' | 'entrepriseId' | 'dueDate' | 'totalInWords'>, invoiceDate?: string) => {
     if (!user) return;
     
     try {
-      const invoiceNumber = generateInvoiceNumber();
+      // Passer la date de la facture pour la numérotation
+      const invoiceNumber = generateInvoiceNumber(invoiceData.date);
       
       const totalInWords = convertNumberToWords(invoiceData.totalTTC);
       
@@ -504,11 +488,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   // Devis
-  const addQuote = async (quoteData: Omit<Quote, 'id' | 'number' | 'createdAt' | 'entrepriseId' | 'totalInWords'>) => {
+  const addQuote = async (quoteData: Omit<Quote, 'id' | 'number' | 'createdAt' | 'entrepriseId' | 'totalInWords'>, quoteDate?: string) => {
     if (!user) return;
     
     try {
-      const quoteNumber = generateQuoteNumber();
+      // Passer la date du devis pour la numérotation
+      const quoteNumber = generateQuoteNumber(quoteData.date);
       const totalInWords = convertNumberToWords(quoteData.totalTTC);
       
       await addDoc(collection(db, 'quotes'), {
