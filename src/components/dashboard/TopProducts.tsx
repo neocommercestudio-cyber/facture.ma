@@ -26,6 +26,7 @@ export default function TopProducts() {
       sales: totalQuantity,
       revenue: totalRevenue,
       category: product.category || 'Non catégorisé'
+      uniti: product.unit || 'unité'
     };
   });
   
