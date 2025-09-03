@@ -194,10 +194,9 @@ export default function Reports() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">{t('reports')}</h1>
      <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-            <UserCheck className="w-8 h-8 text-blue-600" />
-            <span>Gestion Humaine</span>
+            <BarChart3 className="w-8 h-8 text-blue-600" />
+            <span>Rapports</span>
             <Crown className="w-6 h-6 text-yellow-500" />
           </h1>
         
