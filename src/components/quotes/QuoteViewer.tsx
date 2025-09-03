@@ -345,10 +345,10 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 <option value="template1">Classique</option>
-                <option value="template2">Moderne</option>
-                <option value="template3">Minimaliste</option>
-                <option value="template4">Corporate</option>
-                <option value="template5">Premium</option>
+                <option value="template2">Moderne 👑 Pro</option>
+                <option value="template3">Minimaliste 👑 Pro</option>
+                <option value="template4">Corporate 👑 Pro</option>
+                <option value="template5">Premium 👑 Pro</option>
               </select>
               <button
                 onClick={handleDownloadPDF}
