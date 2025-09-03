@@ -193,8 +193,9 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
-        <div>
       <div className="flex justify-between items-center">
+                <div>
+
      <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
             <BarChart3 className="w-8 h-8 text-blue-600" />
             <span>Rapports</span>
