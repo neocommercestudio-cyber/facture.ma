@@ -193,12 +193,17 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
+        <div>
       <div className="flex justify-between items-center">
      <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
             <BarChart3 className="w-8 h-8 text-blue-600" />
             <span>Rapports</span>
             <Crown className="w-6 h-6 text-yellow-500" />
           </h1>
+         <p className="text-gray-600 mt-2">
+           La section Rapports vous permet d’analyser les performances financières de votre entreprise sur la période de votre choix. Fonctionnalité réservée aux abonnés PRO.
+          </p>
+  </div>
         
         <div className="flex space-x-3">
           <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-200">
