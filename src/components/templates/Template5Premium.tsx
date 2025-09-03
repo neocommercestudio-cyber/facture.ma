@@ -21,35 +21,32 @@ export default function Template5Premium({ data, type }: TemplateProps) {
       }}
     >
       {/* HEADER avec wave */}
-    {/* HEADER avec wave */}
-<div className="relative">
-  <div className="bg-[#0a1f44] h-64 flex items-center justify-between px-8 text-white">
-    {user?.company.logo && (
-      <img src={user.company.logo} alt="Logo" className="h-40 w-auto" />
-    )}
+      <div className="relative">
+        <div className="bg-[#0a1f44] h-64 relative flex items-center justify-between px-8 text-white">
+          {user?.company.logo && (
+            <img src={user.company.logo} alt="Logo" className="h-40 w-auto" />
+          )}
 
-    <div className="flex-1 text-center">
-      <h1 className="text-4xl font-extrabold">{user?.company.name}</h1>
-      <h2 className="text-3xl font-bold mt-6 uppercase tracking-wide">{title}</h2>
-    </div>
+          <div className="flex-1 text-center">
+            <h1 className="text-4xl font-extrabold">{user?.company.name}</h1>
+            <h2 className="text-3xl font-bold mt-6 uppercase tracking-wide">{title}</h2>
+          </div>
 
-    <div className="w-20"></div>
-  </div>
+          <div className="w-20"></div>
+        </div>
 
-  {/* vague rouge INSÉRÉE DANS LE FLUX */}
-  <div>
-    <svg
-      className="w-full"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 1440 80"
-    >
-      <path
-        fill="#c1121f"
-        d="M0,64L60,58.7C120,53,240,43,360,37.3C480,32,600,32,720,42.7C840,53,960,75,1080,74.7C1200,75,1320,53,1380,42.7L1440,32V80H0Z"
-      ></path>
-    </svg>
-  </div>
-</div>
+        {/* vague rouge */}
+        <svg
+          className=" bottom-0 left-0 w-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 80"
+        >
+          <path
+            fill="#c1121f"
+            d="M0,64L60,58.7C120,53,240,43,360,37.3C480,32,600,32,720,42.7C840,53,960,75,1080,74.7C1200,75,1320,53,1380,42.7L1440,32V80H0Z"
+          ></path>
+        </svg>
+      </div>
 
       {/* CONTENU PRINCIPAL */}
       <div className="flex-1 flex flex-col">
