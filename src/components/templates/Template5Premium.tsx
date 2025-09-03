@@ -102,7 +102,6 @@ export default function Template5Premium({ data, type }: TemplateProps) {
          <div className="w-80 bg-gray-50 rounded border border-[#0a1f44] p-4">
     <div className="text-sm font-bold pt-3 text-center">
             <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
-              <div className="border-t border-[#03224C] my-2"></div>
             <p className="text-sm font-bold border-t border-[#03224C] pt-2 text-[#03224C]">• {data.totalInWords}</p>
           </div>
        </div>     
