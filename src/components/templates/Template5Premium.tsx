@@ -37,7 +37,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
 
         {/* vague rouge */}
         <svg
-          className="absolute  bottom-0 left-0 w-full"
+          className="absolute  bottom-1 left-1 w-full"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1440 80"
         >
