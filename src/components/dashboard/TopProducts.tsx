@@ -74,7 +74,7 @@ export default function TopProducts() {
                     {product.revenue.toLocaleString()} MAD
                   </span>
                 </div>
-                <p className="text-xs text-gray-500">{product.sales.toFixed(3)} </p>
+                <p className="text-xs text-gray-500">{product.sales.toFixed(3)} {product.uniti} </p>
               </div>
             </div>
           ))
