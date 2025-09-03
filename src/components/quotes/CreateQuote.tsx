@@ -175,7 +175,7 @@ export default function CreateQuote() {
       totalVat,
       totalTTC,
       status: 'draft'
-    });
+    }, quoteDate); // Passer la date pour la numérotation
     
     navigate('/quotes');
   };
