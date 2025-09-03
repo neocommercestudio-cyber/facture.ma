@@ -22,7 +22,7 @@ export default function Template5Premium({ data, type }: TemplateProps) {
     >
       {/* HEADER avec wave */}
       <div className="relative">
-        <div className="bg h-64 relative flex items-center justify-between px-8 text-white">
+        <div className="bg-[#0a1f44]  h-64 relative flex items-center justify-between px-8 text-white">
           {user?.company.logo && (
             <img src={user.company.logo} alt="Logo" className="h-40 w-auto" />
           )}
