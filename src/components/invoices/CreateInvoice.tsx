@@ -176,7 +176,7 @@ export default function CreateInvoice() {
         totalVat,
         totalTTC,
         status: 'unpaid'
-      });
+      }, invoiceDate); // Passer la date pour la numérotation
       
       setShowSuccessModal(true);
       
