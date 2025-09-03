@@ -73,7 +73,7 @@ export default function TopProducts() {
                     {product.revenue.toLocaleString()} MAD
                   </span>
                 </div>
-                <p className="text-xs text-gray-500">{product.sales.toFixed(3)} ({topProducts.unit}) ventes</p>
+                <p className="text-xs text-gray-500">{product.sales.toFixed(3)} ({product.unit}) ventes</p>
               </div>
             </div>
           ))
