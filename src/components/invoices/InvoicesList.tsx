@@ -94,7 +94,7 @@ export default function InvoicesList() {
 
   // Grouper les factures par année
   const invoicesByYear = filteredInvoices.reduce((acc, invoice) => {
-    const year = new Date(invoice.createdAt).getFullYear();
+    const year = new Date(invoice.date).getFullYear();
     if (!acc[year]) {
       acc[year] = [];
     }
