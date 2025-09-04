@@ -5,22 +5,20 @@ import { useAuth } from '../../contexts/AuthContext';
 interface TemplateProps {
   data: Invoice | Quote;
   type: 'invoice' | 'quote';
-  includeSignature?: boolean;
 }
 
-export default function Template2Modern({ data, type, includeSignature = false }: TemplateProps) {
+export default function Template2Modern({ data, type }: TemplateProps) {
   const { user } = useAuth();
   const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
 
   return (
     <div
       className="bg-white mx-auto border border-black flex flex-col relative"
-     style={{
-  fontFamily: 'Arial, sans-serif',
-  width: '794px',  // largeur A4
-  // minHeight: '1124px', // supprime cette ligne
-  // height auto
-}}
+      style={{
+        fontFamily: 'Arial, sans-serif',
+        width: '794px',       // largeur A4
+        minHeight: '1124px',  // hauteur A4
+      }}
     >
       {/* HEADER */}
       <div className="p-8 border-b border-black bg-black text-white text-center">
@@ -89,8 +87,6 @@ export default function Template2Modern({ data, type, includeSignature = false }
           </div>
         </div>
 
-        
-
         {/* TOTALS */}
         <div className="p-8">
           <div className="flex justify-between">
@@ -151,19 +147,8 @@ export default function Template2Modern({ data, type, includeSignature = false }
           <div className="flex justify-start">
             <div className="w-60 bg-gray-50 border border-black rounded p-4 text-center">
               <div className="text-sm font-bold mb-3">Signature</div>
-              <div className="border-2 border-black rounded-sm h-20 flex items-center justify-center relative">
-                {includeSignature && user?.company?.signature ? (
-                  <img 
-                    src={user.company.signature} 
-                    alt="Signature" 
-                    className="max-h-18 max-w-full object-contain"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <span className="text-gray-400 text-sm"> </span>
-                )}
+              <div className="border-2 border-black rounded-sm h-20 flex items-center justify-center">
+                <span className="text-gray-400 text-sm"> </span>
               </div>
             </div>
           </div>
