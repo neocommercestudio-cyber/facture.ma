@@ -77,8 +77,8 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
         allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 800,
-        height: 1200
+        width: 794,
+        height: 1124
       },
       jsPDF: {
         unit: 'mm',
