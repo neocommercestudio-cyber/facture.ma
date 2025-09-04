@@ -44,18 +44,18 @@ export default function Template1Classic({ data, type, includeSignature = false 
       <div className="p-8 border-b border-gray-300">
         <div className="grid grid-cols-2 gap-8">
           <div className="bg-gray-50 p-6 rounded border border-gray-200">
-           <h3 className="font-bold text-lg text-gray-900 mb-3 border-b border-gray-300 pb-2 text-center">
+           <h3 className="font-bold text-sm text-gray-900 mb-3 border-b border-gray-300 pb-2 text-center">
   CLIENT : {data.client.name} {data.client.address}
 </h3>
-<div className="text-lg text-gray-700 space-y-1 text-center">
+<div className="text-sm text-gray-700 space-y-1 text-center">
               <p><strong>ICE:</strong> {data.client.ice}</p>
             </div>
           </div>
          
           <div className="bg-gray-50 p-6 rounded border border-gray-200">
-            <h3 className="font-bold text-lg text-gray-900 mb-3 border-b border-gray-300 pb-2 text-center">DATES : {new Date(data.date).toLocaleDateString('fr-FR')}</h3>
-<div className="text-lg text-gray-700 space-y-1 text-center">
-               <p className="text-lg  text-gray-700"> <strong> {type === 'invoice' ? 'FACTURE' : 'DEVIS'} N° : </strong> {data.number}</p>
+            <h3 className="font-bold text-sm text-gray-900 mb-3 border-b border-gray-300 pb-2 text-center">DATES : {new Date(data.date).toLocaleDateString('fr-FR')}</h3>
+<div className="text-sm text-gray-700 space-y-1 text-center">
+               <p className="text-sm  text-gray-700"> <strong> {type === 'invoice' ? 'FACTURE' : 'DEVIS'} N° : </strong> {data.number}</p>
             </div>
           </div>
         </div>
@@ -94,23 +94,23 @@ export default function Template1Classic({ data, type, includeSignature = false 
   <div className="flex justify-between">
     {/* Bloc gauche */}
     <div className="w-80 bg-gray-50 border border-gray-200 rounded p-2">
-      <div className="flex justify-between text-lg font-bold border-gray-300 pt-3 text-center">
+      <div className="flex justify-between text-sm font-bold border-gray-300 pt-3 text-center">
         <p>Arrêtée le présent {type === 'invoice' ? 'facture' : 'devis'} à la somme de :</p>
       </div>
   
-      <div className="flex justify-between text-lg  border-t border-gray-300 pt-3">
+      <div className="flex justify-between text-sm  border-t border-gray-300 pt-3">
         <p className="text-black">• {data.totalInWords}</p>
       </div>
     </div>
 
     {/* Bloc droit */}
     <div className="w-80 bg-gray-50 border border-gray-200 rounded p-6">
-      <div className="flex justify-between text-lg mb-2">
+      <div className="flex justify-between text-sm mb-2">
         <span>Total HT :</span>
         <span className="font-medium">{data.subtotal.toFixed(2)} MAD</span>
       </div>
 
-<div className="text-lg mb-2">
+<div className="text-sm mb-2">
   {(() => {
     // On regroupe par taux de TVA
     const vatGroups = data.items.reduce(
@@ -148,7 +148,7 @@ export default function Template1Classic({ data, type, includeSignature = false 
 
 
       
-      <div className="flex justify-between text-lg font-bold border-t border-gray-300 pt-3">
+      <div className="flex justify-between text-sm font-bold border-t border-gray-300 pt-3">
         <span>TOTAL TTC :</span>
         <span>{data.totalTTC.toFixed(2)} MAD</span>
       </div>
@@ -160,7 +160,7 @@ export default function Template1Classic({ data, type, includeSignature = false 
   <div className="flex justify-start">
     <div className="w-80 bg-gray-50 border border-gray-200 rounded p-6 text-center">
       {/* Titre centré */}
-      <div className="text-lg font-bold mb-4">
+      <div className="text-sm font-bold mb-4">
         Signature
       </div>
 
@@ -193,7 +193,7 @@ export default function Template1Classic({ data, type, includeSignature = false 
       
 
       {/* FOOTER AVEC INFOS ÉMETTEUR */}
-<div className="bg-gray-100 border-t-2 border-gray-400 p-6 text-lg text-gray-700 text-center">
+<div className="bg-gray-100 border-t-2 border-gray-400 p-6 text-sm text-gray-700 text-center">
           <div>
         <p>
          <strong> {user?.company.name} </strong>  | {user?.company.address} | <strong>Tél :</strong> {user?.company.phone} | <strong>ICE :</strong> {user?.company.ice} |  <strong> IF:</strong> {user?.company.if} | <strong> RC:</strong> {user?.company.rc} | <strong> CNSS:</strong> {user?.company.cnss} | <strong> Patente :</strong> {user?.company.patente} | <strong> EMAIL :</strong> {user?.company.email} | <strong> SITE WEB  :</strong> {user?.company.website}
