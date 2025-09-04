@@ -60,12 +60,12 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
   };
 
   const generatePDFWithTemplate = () => {
+    // Obtenir le contenu directement depuis l'élément affiché
     const quoteContent = document.getElementById('quote-content');
     if (!quoteContent) {
       alert('Erreur: Contenu du devis non trouvé');
       return;
     }
-
     const options = {
       margin: [5, 5, 5, 5],
       filename: `Devis_${quote.number}.pdf`,
