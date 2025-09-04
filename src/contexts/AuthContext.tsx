@@ -21,6 +21,7 @@ interface Company {
   patente: string;
   website: string;
   logo?: string;
+  signature?: string;
   invoiceNumberingFormat?: string;
   invoicePrefix?: string;
   invoiceCounter?: number;
