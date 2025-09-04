@@ -76,8 +76,8 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
         allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 800,
-        height: 1200
+         width: 794,
+        height: 1124
       },
       jsPDF: {
         unit: 'mm',
