@@ -164,9 +164,8 @@ export default function Template2Modern({ data, type }: TemplateProps) {
               </div>
             </div>
           </div>
-       
-
-      
+        </div>
+         </div>
 
       {/* FOOTER collé en bas */}
       <div className="mt-auto bg-black text-white border-t-2 border-white p-6 text-sm text-center">
