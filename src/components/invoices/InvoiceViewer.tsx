@@ -254,3 +254,4 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
     </div>
   );
 }
+
