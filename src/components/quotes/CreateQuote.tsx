@@ -5,7 +5,7 @@ import { useData, Client, QuoteItem } from '../../contexts/DataContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useLicense } from '../../contexts/LicenseContext';
 import { convertNumberToWords } from '../../utils/numberToWords';
-import { ArrowLeft, Plus, Trash2, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Save, Eye, X,FileText } from 'lucide-react';
 import TemplateSelector from '../templates/TemplateSelector';
 import TemplateRenderer from '../templates/TemplateRenderer';
 import ProTemplateModal from '../license/ProTemplateModal';
@@ -27,6 +27,8 @@ export default function CreateQuote() {
   const [showPreview, setShowPreview] = useState(false);
   const [showProModal, setShowProModal] = useState(false);
   const [showUpgradePage, setShowUpgradePage] = useState(false);
+  const [includeSignature, setIncludeSignature] = useState(false);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
   
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -201,6 +203,22 @@ export default function CreateQuote() {
             <Eye className="w-4 h-4" />
             <span>Aperçu</span>
           </button>
+          <label className="inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+            <input
+              type="checkbox"
+              checked={includeSignature}
+              onChange={(e) => {
+                if (e.target.checked && !user?.company?.signature) {
+                  setShowSignatureModal(true);
+                  setIncludeSignature(false);
+                } else {
+                  setIncludeSignature(e.target.checked);
+                }
+              }}
+              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+            />
+            <span className="text-sm font-medium">Signature électronique</span>
+          </label>
           <button
             onClick={handleSave}
             className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
@@ -522,6 +540,7 @@ export default function CreateQuote() {
                     entrepriseId: user?.id || ''
                   }}
                   type="quote"
+                  includeSignature={includeSignature}
                 />
               </div>
             </div>
@@ -529,6 +548,45 @@ export default function CreateQuote() {
         </div>
       )}
 
+      {/* Modal pour signature manquante */}
+      {showSignatureModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20">
+            <div className="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+              <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-4 text-white">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">🖋️ Signature électronique manquante</h3>
+                  <button
+                    onClick={() => setShowSignatureModal(false)}
+                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileText className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    Aucune signature enregistrée
+                  </h3>
+                  <p className="text-gray-600">
+                    Pour ajouter votre signature sur les devis, vous devez d'abord l'enregistrer dans vos paramètres.
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <h4 className="font-medium text-blue-900 mb-2">📝 Étapes pour ajouter votre cachet :</h4>
+                  <ol className="text-sm text-blue-800 space-y-1">
+                    <li>1. Écrivez votre cachet sur une feuille blanche et prenez une photo</li>
+                    <li>2. Rendez-vous sur <a href="https://remove.bg" target="_blank" rel="noopener noreferrer" className="underline font-medium">remove.bg</a> pour supprimer l'arrière-plan</li>
+                    <li>3. Importez votre image sur <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">imgbb.com</a> pour l'héberger</li>
+                    <li>4. Copiez le lien direct de votre image et collez-le dans vos paramètres</li>
+                  </ol>
+                </div>
       {/* Modal Pro Template */}
       {showProModal && (
         <ProTemplateModal
@@ -538,6 +596,28 @@ export default function CreateQuote() {
         />
       )}
 
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => {
+                      setShowSignatureModal(false);
+                      navigate('/settings');
+                    }}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  >
+                    Ajouter maintenant
+                  </button>
+                  <button
+                    onClick={() => setShowSignatureModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Plus tard
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Page d'upgrade */}
       {showUpgradePage && (
         <div className="fixed inset-0 z-[60] bg-gray-500 bg-opacity-75">
