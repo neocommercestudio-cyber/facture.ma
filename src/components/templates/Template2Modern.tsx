@@ -142,18 +142,31 @@ export default function Template2Modern({ data, type }: TemplateProps) {
           </div>
         </div>
 
+
         {/* SIGNATURE */}
         <div className="p-6">
           <div className="flex justify-start">
             <div className="w-60 bg-gray-50 border border-black rounded p-4 text-center">
               <div className="text-sm font-bold mb-3">Signature</div>
-              <div className="border-2 border-black rounded-sm h-20 flex items-center justify-center">
-                <span className="text-gray-400 text-sm"> </span>
+              <div className="border-2 border-black rounded-sm h-20 flex items-center justify-center relative">
+                {includeSignature && user?.company?.signature ? (
+                  <img 
+                    src={user.company.signature} 
+                    alt="Signature" 
+                    className="max-h-18 max-w-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <span className="text-gray-400 text-sm"> </span>
+                )}
               </div>
             </div>
           </div>
         </div>
-      </div>
+
+      
 
       {/* FOOTER collé en bas */}
       <div className="mt-auto bg-black text-white border-t-2 border-white p-6 text-sm text-center">
