@@ -51,7 +51,7 @@ export default function QuoteViewer({ quote, onClose, onEdit, onDownload, onUpgr
     generatePDFWithTemplate();
   };
 
-  const handleDownloadPDF = () => {
+ const handleDownloadPDF = () => {
     if (isTemplateProOnly(selectedTemplate) && licenseType !== 'pro') {
       setShowProModal(true);
       return;
