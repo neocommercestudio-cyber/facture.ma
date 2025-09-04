@@ -469,6 +469,7 @@ export default function Settings() {
                   type="url"
                   value={signatureUrl}
                   onChange={(e) => setSignatureUrl(e.target.value)}
+
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="https://i.ibb.co/votre-signature.png"
                 />
@@ -478,7 +479,7 @@ export default function Settings() {
                     <img 
                       src={signatureUrl} 
                       alt="Signature" 
-                      className="max-h-20 mx-auto border border-gray-200 rounded"
+                      className="max-h-20 mx-30 border border-gray-200 rounded"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
