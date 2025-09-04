@@ -4,7 +4,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Building2, User, Bell, Shield, FileText, Palette } from 'lucide-react';
+import { Building2, User, Bell, Shield, FileText, Palette, X } from 'lucide-react';
 import TemplateSelector from '../templates/TemplateSelector';
 
 export default function Settings() {
@@ -32,6 +32,10 @@ export default function Settings() {
   const [defaultTemplate, setDefaultTemplate] = useState('template1');
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
+  const [signatureUrl, setSignatureUrl] = useState('');
+  const [isSavingSignature, setIsSavingSignature] = useState(false);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+
   // Initialiser les paramètres avec les données utilisateur
   React.useEffect(() => {
     if (user?.company) {
@@ -53,6 +57,7 @@ export default function Settings() {
         prefix: user.company.invoicePrefix || 'FAC'
       });
       setDefaultTemplate(user.company.defaultTemplate || 'template1');
+      setSignatureUrl(user.company.signature || '');
     }
   }, [user]);
 
@@ -118,6 +123,25 @@ export default function Settings() {
       alert('Erreur lors de la sauvegarde du modèle');
     } finally {
       setIsSavingTemplate(false);
+    }
+  };
+
+  const handleSaveSignature = async () => {
+    if (!user) return;
+    
+    setIsSavingSignature(true);
+    try {
+      await updateCompanySettings({
+        signature: signatureUrl
+      });
+      
+      alert('Signature électronique sauvegardée avec succès !');
+      setShowSignatureModal(false);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      alert('Erreur lors de la sauvegarde de la signature');
+    } finally {
+      setIsSavingSignature(false);
     }
   };
 
@@ -427,6 +451,70 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* Electronic Signature Settings */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Signature Électronique (Cachet)</h3>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  URL de votre signature/cachet
+                </label>
+                <input
+                  type="url"
+                  value={signatureUrl}
+                  onChange={(e) => setSignatureUrl(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="https://i.ibb.co/votre-signature.png"
+                />
+                {signatureUrl && (
+                  <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-2">Aperçu de votre signature :</p>
+                    <img 
+                      src={signatureUrl} 
+                      alt="Signature" 
+                      className="max-h-20 mx-auto border border-gray-200 rounded"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">📝 Étapes pour ajouter votre cachet :</h4>
+                <ol className="text-sm text-blue-800 space-y-2">
+                  <li>1. Écrivez votre cachet sur une feuille blanche et prenez une photo</li>
+                  <li>2. Rendez-vous sur <a href="https://remove.bg" target="_blank" rel="noopener noreferrer" className="underline font-medium">remove.bg</a> pour supprimer l'arrière-plan</li>
+                  <li>3. Importez votre image sur <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">imgbb.com</a> pour l'héberger</li>
+                  <li>4. Copiez le lien direct de votre image et collez-le dans le champ ci-dessus</li>
+                </ol>
+              </div>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleSaveSignature}
+                  disabled={isSavingSignature || !signatureUrl}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
+                >
+                  {isSavingSignature ? 'Sauvegarde...' : 'Sauvegarder la signature'}
+                </button>
+                <button
+                  onClick={() => setShowSignatureModal(true)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Aide détaillée
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="space-y-4">
               <div>
@@ -580,6 +668,94 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      {/* Modal d'aide pour la signature */}
+      {showSignatureModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20">
+            <div className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Guide : Ajouter votre signature électronique</h3>
+                  <button
+                    onClick={() => setShowSignatureModal(false)}
+                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-blue-900 mb-3">🎯 Objectif</h4>
+                    <p className="text-blue-800">
+                      Ajouter votre cachet/signature personnalisé sur vos factures et devis pour un rendu professionnel.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-gray-900">📋 Étapes détaillées :</h4>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                        <div>
+                          <h5 className="font-medium text-gray-900">Créer votre cachet</h5>
+                          <p className="text-sm text-gray-600">Écrivez votre cachet sur une feuille blanche et prenez une photo claire</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                        <div>
+                          <h5 className="font-medium text-gray-900">Supprimer l'arrière-plan</h5>
+                          <p className="text-sm text-gray-600 mb-2">Allez sur <a href="https://remove.bg" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">remove.bg</a> et uploadez votre photo</p>
+                          <p className="text-xs text-gray-500">Cela rendra votre signature transparente</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                        <div>
+                          <h5 className="font-medium text-gray-900">Héberger votre image</h5>
+                          <p className="text-sm text-gray-600 mb-2">Allez sur <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">imgbb.com</a> et uploadez votre signature sans fond</p>
+                          <p className="text-xs text-gray-500">Choisissez "Don't auto delete" pour garder l'image en permanence</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                        <div>
+                          <h5 className="font-medium text-gray-900">Copier le lien</h5>
+                          <p className="text-sm text-gray-600">Copiez le lien direct de votre image et collez-le dans le champ "URL de votre signature"</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 className="font-medium text-green-900 mb-2">✅ Résultat</h4>
+                    <p className="text-sm text-green-800">
+                      Votre signature apparaîtra automatiquement sur vos factures et devis quand vous cochez l'option "Ajouter ma signature électronique".
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end mt-6">
+                  <button
+                    onClick={() => setShowSignatureModal(false)}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  >
+                    Compris !
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
