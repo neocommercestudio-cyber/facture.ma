@@ -18,7 +18,7 @@ export default function Template2Modern({ data, type, includeSignature = false }
       style={{
         fontFamily: 'Arial, sans-serif',
         width: '794px',       // largeur A4
-        minHeight: '1133px',  // hauteur A4
+        minHeight: '1124px',  // hauteur A4
       }}
     >
       {/* HEADER */}
@@ -87,6 +87,8 @@ export default function Template2Modern({ data, type, includeSignature = false }
             </table>
           </div>
         </div>
+
+        
 
         {/* TOTALS */}
         <div className="p-8">
