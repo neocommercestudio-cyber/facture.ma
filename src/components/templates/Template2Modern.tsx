@@ -164,7 +164,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
               </div>
             </div>
           </div>
-        </div>
+       
 
       
 
