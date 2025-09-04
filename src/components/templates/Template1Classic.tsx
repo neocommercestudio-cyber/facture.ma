@@ -5,9 +5,10 @@ import { useAuth } from '../../contexts/AuthContext';
 interface TemplateProps {
   data: Invoice | Quote;
   type: 'invoice' | 'quote';
+  includeSignature?: boolean;
 }
 
-export default function Template1Classic({ data, type }: TemplateProps) {
+export default function Template1Classic({ data, type, includeSignature = false }: TemplateProps) {
   const { user } = useAuth();
   const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
 
@@ -164,8 +165,19 @@ export default function Template1Classic({ data, type }: TemplateProps) {
       </div>
 
       {/* Case vide pour signature + cachet */}
-      <div className="border-2 border-gray-300 rounded-lg h-32 flex items-center justify-center">
-        <span className="text-gray-400 text-sm">  </span>
+      <div className="border-2 border-gray-300 rounded-lg h-32 flex items-center justify-center relative">
+        {includeSignature && user?.company?.signature ? (
+          <img 
+            src={user.company.signature} 
+            alt="Signature" 
+            className="max-h-15 max-w-full object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        ) : (
+          <span className="text-gray-400 text-sm"> </span>
+        )}
       </div>
     </div>
   </div>
