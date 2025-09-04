@@ -131,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 phone: userData.phone,
                 logo: userData.logo,
                 email: userData.email,
+                signature: userData.signature || "",   // 🔹 AJOUT ICI
                 patente: userData.patente,
                 website: userData.website,
                 invoiceNumberingFormat: userData.invoiceNumberingFormat,
