@@ -15,11 +15,12 @@ export default function Template2Modern({ data, type, includeSignature = false }
   return (
     <div
       className="bg-white mx-auto border border-black flex flex-col relative"
-      style={{
-        fontFamily: 'Arial, sans-serif',
-        width: '794px',       // largeur A4
-        minHeight: '1124px',  // hauteur A4
-      }}
+     style={{
+  fontFamily: 'Arial, sans-serif',
+  width: '794px',  // largeur A4
+  // minHeight: '1124px', // supprime cette ligne
+  // height auto
+}}
     >
       {/* HEADER */}
       <div className="p-8 border-b border-black bg-black text-white text-center">
