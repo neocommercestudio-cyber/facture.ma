@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLicense } from '../../contexts/LicenseContext';
 import { Invoice } from '../../contexts/DataContext';
@@ -19,7 +19,10 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
   const { user } = useAuth();
   const { licenseType } = useLicense();
   const [selectedTemplate, setSelectedTemplate] = React.useState(user?.company?.defaultTemplate || 'template1');
+    const [includeSignature, setIncludeSignature] = useState(false);
   const [showProModal, setShowProModal] = React.useState(false);
+    const [showSignatureModal, setShowSignatureModal] = useState(false);
+
 
   const templates = [
     { id: 'template1', name: 'Classique', isPro: false },
@@ -63,6 +66,72 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
       return;
     }
 
+   {/* Modal pour signature manquante */}
+      {showSignatureModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20">
+            <div className="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+              <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 text-white">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">🖋️ Signature électronique manquante</h3>
+                  <button
+                    onClick={() => setShowSignatureModal(false)}
+                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileText className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    Aucune signature enregistrée
+                  </h3>
+                  <p className="text-gray-600">
+                    Pour ajouter votre signature sur les factures, vous devez d'abord l'enregistrer dans vos paramètres.
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <h4 className="font-medium text-blue-900 mb-2">📝 Étapes pour ajouter votre cachet :</h4>
+                  <ol className="text-sm text-blue-800 space-y-1">
+                    <li>1. Écrivez votre cachet sur une feuille blanche et prenez une photo</li>
+                    <li>2. Rendez-vous sur <a href="https://remove.bg" target="_blank" rel="noopener noreferrer" className="underline font-medium">remove.bg</a> pour supprimer l'arrière-plan</li>
+                    <li>3. Importez votre image sur <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">imgbb.com</a> pour l'héberger</li>
+                    <li>4. Copiez le lien direct de votre image et collez-le dans vos paramètres</li>
+                  </ol>
+                </div>
+
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => {
+                      setShowSignatureModal(false);
+                      navigate('/settings');
+                    }}
+                    className="flex-1 bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  >
+                    Ajouter maintenant
+                  </button>
+                  <button
+                    onClick={() => setShowSignatureModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Plus tard
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+    
+
     // Options pour html2pdf
     const options = {
       margin: [5, 5, 5, 5],
@@ -74,8 +143,8 @@ export default function InvoiceViewer({ invoice, onClose, onEdit, onDownload, on
         allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 794,
-        height: 1138
+        width: 800,
+        height: 1200
       },
       jsPDF: { 
         unit: 'mm', 
@@ -293,7 +362,12 @@ const generateTemplate1HTML = () => {
     <div style="padding: 10px;">
       <div style="width: 300px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center;">
         <div style="font-weight: bold; margin-bottom: 18px;">Signature</div>
-        <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 120px;"></div>
+        <div style="border: 2px solid #d1d5db; border-radius: 8px; height: 120px; display: flex; align-items: center; justify-content: center;">
+          ${includeSignature && user?.company?.signature ? 
+            `<img src="${user.company.signature}" alt="Signature" style="max-height: 110px; max-width: 100%; object-fit: contain;" />` : 
+            ''
+          }
+        </div>
       </div>
     </div>
 
@@ -592,7 +666,10 @@ const generateTemplate3HTML = () => {
     <!-- SIGNATURE -->
     <div style="padding: 24px 30px; position: relative; z-index: 10;">
       <div style="width: 250px; border: 2px dashed #0a1f44; border-radius: 8px; height: 115px; display: flex; align-items: center; justify-content: center;">
-        <span style="color: #9ca3af;">Signature</span>
+        ${includeSignature && user?.company?.signature ? 
+          `<img src="${user.company.signature}" alt="Signature" style="max-height: 105px; max-width: 100%; object-fit: contain;" />` : 
+          '<span style="color: #9ca3af;">Signature</span>'
+        }
       </div>
     </div>
 
@@ -739,7 +816,10 @@ const generateTemplate4HTML = () => {
     <!-- SIGNATURE -->
     <div style="padding:30px;">
       <div style="width:250px;height:100px;border:2px dashed #24445C;border-radius:8px;display:flex;align-items:center;justify-content:center;">
-        <span style="color:#999;">Signature</span>
+        ${includeSignature && user?.company?.signature ? 
+          `<img src="${user.company.signature}" alt="Signature" style="max-height: 90px; max-width: 100%; object-fit: contain;" />` : 
+          '<span style="color:#999;">Signature</span>'
+        }
       </div>
     </div>
 
@@ -902,7 +982,10 @@ const generateTemplate4HTML = () => {
     <!-- SIGNATURE -->
     <div style="padding:24px 32px;">
       <div style="width:250px; border:2px dashed #0a1f44; border-radius:8px; height:110px; display:flex; align-items:center; justify-content:center; color:gray;">
-        Signature
+        ${includeSignature && user?.company?.signature ? 
+          `<img src="${user.company.signature}" alt="Signature" style="max-height: 100px; max-width: 100%; object-fit: contain;" />` : 
+          'Signature'
+        }
       </div>
     </div>
 
@@ -934,17 +1017,36 @@ const generateTemplate4HTML = () => {
               Facture {invoice.number}
             </h3>
             <div className="flex items-center space-x-3">
+              
+               <label className="inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+            <input
+              type="checkbox"
+              checked={includeSignature}
+              onChange={(e) => {
+                if (e.target.checked && !user?.company?.signature) {
+                  setShowSignatureModal(true);
+                  setIncludeSignature(false);
+                } else {
+                  setIncludeSignature(e.target.checked);
+                }
+              }}
+              className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+            />
+            <span className="text-sm font-medium">Ajouter ma signature électronique</span>
+          </label>
+              
               <select
                 value={selectedTemplate}
                 onChange={(e) => setSelectedTemplate(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               >
                 <option value="template1">Classique</option>
-                <option value="template2">Moderne 👑 Pro</option>
-                <option value="template3">Minimaliste 👑 Pro</option>
-                <option value="template4">Corporate 👑 Pro</option>
-                <option value="template5">Premium 👑 Pro</option>
+                <option value="template2">Moderne</option>
+                <option value="template3">Minimaliste</option>
+                <option value="template4">Corporate</option>
+                <option value="template5">Premium</option>
               </select>
+              
               <button
                 onClick={handleDownloadPDF}
                 className="inline-flex items-center space-x-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors"
