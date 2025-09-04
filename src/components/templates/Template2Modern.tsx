@@ -5,9 +5,10 @@ import { useAuth } from '../../contexts/AuthContext';
 interface TemplateProps {
   data: Invoice | Quote;
   type: 'invoice' | 'quote';
+  includeSignature?: boolean;
 }
 
-export default function Template2Modern({ data, type }: TemplateProps) {
+export default function Template2Modern({ data, type, includeSignature = false }: TemplateProps) {
   const { user } = useAuth();
   const title = type === 'invoice' ? 'FACTURE' : 'DEVIS';
 
@@ -17,7 +18,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
       style={{
         fontFamily: 'Arial, sans-serif',
         width: '794px',       // largeur A4
-        minHeight: '1124px',  // hauteur A4
+        minHeight: '1133px',  // hauteur A4
       }}
     >
       {/* HEADER */}
@@ -142,7 +143,6 @@ export default function Template2Modern({ data, type }: TemplateProps) {
           </div>
         </div>
 
-
         {/* SIGNATURE */}
         <div className="p-6">
           <div className="flex justify-start">
@@ -165,7 +165,7 @@ export default function Template2Modern({ data, type }: TemplateProps) {
             </div>
           </div>
         </div>
-         </div>
+      </div>
 
       {/* FOOTER collé en bas */}
       <div className="mt-auto bg-black text-white border-t-2 border-white p-6 text-sm text-center">
