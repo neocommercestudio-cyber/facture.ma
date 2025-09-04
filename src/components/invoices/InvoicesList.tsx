@@ -148,7 +148,7 @@ export default function InvoicesList() {
     tempDiv.style.backgroundColor = 'white';
     tempDiv.style.zIndex = '-1';
     tempDiv.style.opacity = '0';
-    tempDiv.innerHTML = generateSimpleInvoiceHTML(invoice);
+    tempDiv.innerHTML = generateSimpleInvoiceHTML(invoice, false); // Pas de signature par défaut dans la liste
     document.body.appendChild(tempDiv);
 
     // Options pour html2pdf
@@ -400,7 +400,7 @@ export default function InvoicesList() {
     return generateTemplate1HTML(invoice);
   };
 
-  const generateSimpleInvoiceHTML = (invoice: any) => {
+  const generateSimpleInvoiceHTML = (invoice: any, includeSignature: boolean = false) => {
     return `
       <div style="padding: 20px; font-family: Arial, sans-serif; background: white; width: 100%; min-height: 297mm;">
         <!-- Header -->
@@ -474,6 +474,23 @@ export default function InvoicesList() {
           <p style="margin: 0; font-size: 14px; font-weight: bold; color: #0c4a6e;">
             Arrêtée la présente facture à la somme de: ${invoice.totalInWords}
           </p>
+        </div>
+        
+        <!-- Conditions -->
+        <div style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px; border: 1px solid #f59e0b;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+              <p style="margin: 0; font-size: 12px; color: #92400e;">
+                <strong>Conditions:</strong> Règlement à 30 jours. Merci de votre confiance.
+              </p>
+            </div>
+            ${includeSignature && user?.company?.signature ? 
+              `<div style="width: 120px; height: 80px; border: 1px solid #f59e0b; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: white;">
+                <img src="${user.company.signature}" alt="Signature" style="max-height: 70px; max-width: 110px; object-fit: contain;" />
+              </div>` : 
+              ''
+            }
+          </div>
         </div>
         
         <!-- Footer -->
