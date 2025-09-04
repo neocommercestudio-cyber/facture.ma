@@ -118,7 +118,7 @@ export default function QuotesList() {
     tempDiv.style.backgroundColor = 'white';
     tempDiv.style.zIndex = '-1';
     tempDiv.style.opacity = '0';
-    tempDiv.innerHTML = generateSimpleQuoteHTML(quote);
+    tempDiv.innerHTML = generateSimpleQuoteHTML(quote, false); // Pas de signature par défaut dans la liste
     document.body.appendChild(tempDiv);
 
     // Options pour html2pdf
@@ -317,7 +317,7 @@ export default function QuotesList() {
     return generateTemplate1HTML(quote);
   };
 
-  const generateSimpleQuoteHTML = (quote: any) => {
+  const generateSimpleQuoteHTML = (quote: any, includeSignature: boolean = false) => {
     return `
       <div style="padding: 20px; font-family: Arial, sans-serif; background: white; width: 100%; min-height: 297mm;">
         <!-- Header -->
@@ -395,10 +395,20 @@ export default function QuotesList() {
         
         <!-- Conditions -->
         <div style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px; border: 1px solid #f59e0b;">
-          <p style="margin: 0; font-size: 12px; color: #92400e;">
-            <strong>Conditions:</strong> Ce devis est valable jusqu'au ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}. 
-            Prix fermes et non révisables. Règlement à 30 jours.
-          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+              <p style="margin: 0; font-size: 12px; color: #92400e;">
+                <strong>Conditions:</strong> Ce devis est valable jusqu'au ${new Date(quote.validUntil).toLocaleDateString('fr-FR')}. 
+                Prix fermes et non révisables. Règlement à 30 jours.
+              </p>
+            </div>
+            ${includeSignature && user?.company?.signature ? 
+              `<div style="width: 120px; height: 80px; border: 1px solid #f59e0b; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: white;">
+                <img src="${user.company.signature}" alt="Signature" style="max-height: 70px; max-width: 110px; object-fit: contain;" />
+              </div>` : 
+              ''
+            }
+          </div>
         </div>
         
         <!-- Footer -->
